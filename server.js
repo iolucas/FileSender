@@ -5,9 +5,9 @@ var cfenv = require("cfenv"),   //get cloud foundry enviroment module
     http  = require("http"),    //get http module
     ws = require("ws"), //get the websocket module
     express = require("express"),   //get express module
-    Wocket = require("../Wocket/Wocket"),  //Import MaestroSocket class from MaestroSocket.js
+    Wocket = require("./Wocket"),  //Import MaestroSocket class from MaestroSocket.js
     //IdManager = require("./IdManager"), //get IdManager module
-    //Misc = require("./MiscFunctions"),  //Import MiscFunctions class from MiscFunctions.js 
+    Misc = require("./MiscFunctions"),  //Import MiscFunctions class from MiscFunctions.js 
 
 //INIT MODULES
     appEnv = cfenv.getAppEnv(),   // get environmental information for this app
@@ -27,6 +27,7 @@ app.use(express.static("public"));
 app.get("/", function(req, res) {
     var newSession = createSession();
     log("New session created: " + newSession);    
+    //res.redirect("https://b.qeek.me/" + newSession);
     res.redirect(newSession); 
 });
 
@@ -34,7 +35,7 @@ app.get("/", function(req, res) {
 app.get("/*", function(req, res) {  
     //CHECK REQUESTED GET/*
     if(req.path == "/status")
-        res.send("<html>Status:<br>Connections: " + lengthOf(connections) + "<br>Sessions: " + lengthOf(sessions));
+        res.send("<html>Status:<br>Connections: " + Misc.LengthOf(connections) + "<br>Sessions: " + Misc.LengthOf(sessions));
     else if(req.path.indexOf(".") == -1) //verify if the request has no dot, meaning that is session request
         res.sendFile(__dirname + "/public/session.html");
     else    //if any dot is found, 
@@ -111,9 +112,10 @@ wsServer.on("connection", function(sock) {
         connSession = sessionId;
         username = user;
         /*  Create new connection ID    */
-        connId = getId(10);    
-        while(connections[connId])
-            connId = getId(10);        
+        do {
+            connId = Misc.GetAlphaNumId(10);    
+        } while(connections[connId]);
+          
         connections[connId] = wSocket;
         log("New client ID: " + username + " " + connId);
         /*  -------------------------   */
@@ -139,8 +141,8 @@ wsServer.on("connection", function(sock) {
                 delete connections[connId];
             
             log("Client " + connId + " disconnected.");
-            log("Session members: " + lengthOf(sessions[sessionId].members));
-            if(lengthOf(sessions[sessionId].members) == 0) {
+            log("Session members: " + Misc.LengthOf(sessions[sessionId].members));
+            if(Misc.LengthOf(sessions[sessionId].members) == 0) {
                 log("Deleting empty session.");
                 delete sessions[sessionId];          
             }
@@ -151,7 +153,7 @@ wsServer.on("connection", function(sock) {
                 log("ID: " + newHostId + " is now the new host.");
             
                 log("Informing session members...");
-                log(lengthOf(sessions[sessionId].members));
+                log(Misc.LengthOf(sessions[sessionId].members));
                 for(memberId in sessions[sessionId].members) {
                     if(sessions[sessionId].hostId != memberId)
                         sessions[sessionId].members[memberId].emit("newHost", newHostId);
@@ -189,11 +191,6 @@ function createSession() {
     do {
         var newSessionId = getWordId();       
     } while(sessions[newSessionId]);
-    
-    /*var newSessionId = getId(5);
-        
-    while(sessions[newSessionId])
-        newSessionId = getId(5);*/
              
     sessions[newSessionId] = new Object();
     sessions[newSessionId].hostId= "";
@@ -212,8 +209,6 @@ function electHost(sessionId) {
         log("THE NEW HOST ISSS" + sessions[sessionId].hostId);
         return memberId;
     }
-    
-    
 }
 
 function getDataStr(dataObj) {
@@ -223,40 +218,6 @@ function getDataStr(dataObj) {
 function getDataObj(dataStr) {
     return JSON.parse(dataStr);
 }
-
-
-
-function lengthOf(obj) {
-    var c=0;
-    for(var fieldName in obj)
-    {
-        c++;
-    }
-    return c;
-}
-
-function getId(size)
-{
-    var text = "";
-    var possible = "abcdefghijklmnopqrstuvwxyz0123456789";
-
-    for( var i=0; i < size; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
-}
-
-function getNumber(size)
-{
-    var text = "";
-    var possible = "0123456789";
-
-    for( var i=0; i < size; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
-}
-
 
 function getWordId()
 {
@@ -268,7 +229,7 @@ function getWordId()
     if(Math.random() > 0.5)
         numberFirst = true;
     
-    var numberId = getNumber(3);
+    var numberId = Misc.GetNumId(3);
     
     var wIndex = (Math.random() * wordList.length).toFixed(0);  //got to fix 0 decimal places to use an index
     var wordId = wordList[wIndex];  
@@ -284,7 +245,7 @@ function getWordId()
     
 function log(string){   //wrap for log info into the console
     cTime = new Date();
-    console.log(cTime.getHours() + ":" + cTime.getMinutes() + ":" + cTime.getSeconds() + "\t" + string);
+    console.log(Misc.GetTimeStamp() + " " + string);
 }
 
 
