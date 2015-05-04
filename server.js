@@ -5,7 +5,7 @@ var cfenv = require("cfenv"),   //get cloud foundry enviroment module
     http  = require("http"),    //get http module
     ws = require("ws"), //get the websocket module
     express = require("express"),   //get express module
-    //Wocket = require("../Wocket/Wocket");  //Import MaestroSocket class from MaestroSocket.js
+    Wocket = require("../Wocket/Wocket"),  //Import MaestroSocket class from MaestroSocket.js
     //IdManager = require("./IdManager"), //get IdManager module
     //Misc = require("./MiscFunctions"),  //Import MiscFunctions class from MiscFunctions.js 
 
@@ -83,115 +83,103 @@ var connections = [];
 
 var sessions = [];
 
-wsServer.on("connection", function(socket) {
+wsServer.on("connection", function(sock) {
         
     var connId = "";
     var username = "";
     
     log("New connection.");
     
-    socket.on("message", function(message) {
-        
-        var dataObj = getDataObj(message);
-        
-        switch(dataObj.type) {
-                
-            case "joinSession":
-                //atribuite id only when joining sessions
-                //generate timeout in case information is not send by connected client
-                var sessionId = dataObj.data[0];
-                var user = dataObj.data[1];
-                
-                if(!sessions[sessionId]) {
-                    socket.send(getDataStr({type: "joinError", data: [sessionId]}));
-                    log("Session join error");
-                    socket.close();
-                    return;   
-                }
-        
-                //get session ref
-                connSession = sessionId;
-                username = user;
-                /*  Create new connection ID    */
-                connId = getId(10);    
-                while(connections[connId])
-                    connId = getId(10);        
-                connections[connId] = socket;
-                log("New client ID: " + username + " " + connId);
-                /*  -------------------------   */
-        
-                /*          Join Session        */
-                sessions[sessionId].members[connId] = socket;
-            
-                if(sessions[sessionId].hostId == "") {
-                    sessions[sessionId].hostId = connId;
-                    socket.send(getDataStr({type: "sessionJoined",data: ["", sessionId, connId]}));
-                } else {
-                    var hostId = sessions[sessionId].hostId;
-                    socket.send(getDataStr({type: "sessionJoined",data: [hostId, sessionId, connId]}));
-                    //got to have two separate emites due to in case of host it has to be empty and it is changed in the middle way
-                }
-        
-                socket.on("close", function() {
-            
-                    if(sessions[sessionId].members[connId])
-                        delete sessions[sessionId].members[connId];
-
-                    if(connections[connId])
-                        delete connections[connId];
-            
-                    log("Client " + connId + " disconnected.");
-                    log("Session members: " + lengthOf(sessions[sessionId].members));
-                    if(lengthOf(sessions[sessionId].members) == 0) {
-                        log("Deleting empty session.");
-                        delete sessions[sessionId];          
-                    }
-                    else if(sessions[sessionId].hostId == connId) {  //so you were the host, need to get a new
-            
-                        log("Host has disconnected. Electing new host...");    
-                        var newHostId = electHost(sessionId);  
-                        log("ID: " + newHostId + " is now the new host.");
-            
-                        log("Informing session members...");
-                        log(lengthOf(sessions[sessionId].members));
-                        for(memberId in sessions[sessionId].members) {
-                            if(sessions[sessionId].hostId != memberId)
-                                sessions[sessionId].members[memberId].send(getDataStr({type: "newHost", data: [newHostId]}));
-                            else
-                                sessions[sessionId].members[memberId].send(getDataStr({type: "newHost", data: [""]}));
-                        }
-            
-                        log("All sessions has been informed.");
-
-                        log("Informing host socket is closed");
-			             sessions[sessionId].members[sessions[sessionId].hostId].send(getDataStr({type: "peerClosure", data: [connId]}));
-                    } else {
-                        log("Informing peers socket is closed");
-			             sessions[sessionId].members[sessions[sessionId].hostId].send(getDataStr({type: "peerClosure", data: [connId]}));
-                    }
-                });
-        
-            break;
-                
-            case "peerData":
-            /*          SESSION JOINED              */
-            var destId = dataObj.data[0],
-                sessionId = dataObj.data[1],
-                data = dataObj.data[2];
-                
-            //maybe implement query id in the future
-                try {
-                    if(sessions[sessionId].members[destId])
-                        sessions[sessionId].members[destId].send(getDataStr({type: "peerData", data: [connId,data]}));
-                    else
-                        socket.send(getDataStr({type: "peerDataError", data: [destId,data]}));
-                } catch (error) {
-                    
-                }
-            break;
-        }
+    wSocket = new Wocket(sock);
+    
+    wSocket.on("error", function() {
+        log("Websocket error.");    
     });
     
+    wSocket.on("joinSession", function(sessionId, user) {
+    //atribuite id only when joining sessions
+    //generate timeout in case information is not send by connected client
+                
+        if(!sessions[sessionId]) {
+            wSocket.emit("joinError", sessionId);
+            log("Session join error");
+            wSocket.close();
+            return;   
+        }
+        
+        //get session ref
+        connSession = sessionId;
+        username = user;
+        /*  Create new connection ID    */
+        connId = getId(10);    
+        while(connections[connId])
+            connId = getId(10);        
+        connections[connId] = wSocket;
+        log("New client ID: " + username + " " + connId);
+        /*  -------------------------   */
+        
+        /*          Join Session        */
+        sessions[sessionId].members[connId] = wSocket;
+            
+        if(sessions[sessionId].hostId == "") {
+            sessions[sessionId].hostId = connId;
+            wSocket.emit("sessionJoined", "", sessionId, connId);
+        } else {
+            var hostId = sessions[sessionId].hostId;
+            wSocket.emit("sessionJoined", hostId, sessionId, connId);
+            //got to have two separate emites due to in case of host it has to be empty and it is changed in the middle way
+        }
+        
+        wSocket.on("close", function() {
+            
+            if(sessions[sessionId].members[connId])
+                delete sessions[sessionId].members[connId];
+
+            if(connections[connId])
+                delete connections[connId];
+            
+            log("Client " + connId + " disconnected.");
+            log("Session members: " + lengthOf(sessions[sessionId].members));
+            if(lengthOf(sessions[sessionId].members) == 0) {
+                log("Deleting empty session.");
+                delete sessions[sessionId];          
+            }
+            else if(sessions[sessionId].hostId == connId) {  //so you were the host, need to get a new
+            
+                log("Host has disconnected. Electing new host...");    
+                var newHostId = electHost(sessionId);  
+                log("ID: " + newHostId + " is now the new host.");
+            
+                log("Informing session members...");
+                log(lengthOf(sessions[sessionId].members));
+                for(memberId in sessions[sessionId].members) {
+                    if(sessions[sessionId].hostId != memberId)
+                        sessions[sessionId].members[memberId].emit("newHost", newHostId);
+                    else
+                        sessions[sessionId].members[memberId].emit("newHost", "");
+                }
+            
+                log("All sessions has been informed.");
+
+                log("Informing host socket is closed");
+                sessions[sessionId].members[sessions[sessionId].hostId].emit("peerClosure", connId);
+            } else {
+                log("Informing peers socket is closed");
+                sessions[sessionId].members[sessions[sessionId].hostId].emit("peerClosure", connId);
+            }
+        });
+    });
+    
+    wSocket.on("peerData", function(destId, sessionId, data) {        
+
+    //maybe implement query id in the future
+        try {
+            if(sessions[sessionId].members[destId])
+                sessions[sessionId].members[destId].emit("peerData", connId, data);
+            else
+                wSocket.emit("peerDataError", destId, data);
+        } catch (error) {}
+    });    
 });
 
 

@@ -94,7 +94,7 @@
 //  -------------------------------------*/
 
 
-var socket; //Instance to have real time connection with the server
+var wSocket; //Instance to have real time connection with the server
 
 var username = "";  //var to store instance username
     
@@ -176,282 +176,254 @@ function main(sessionId, user) {
     putScreenMsg("Connecting...");
     
     var localUrl = document.URL.substring(7, document.URL.lastIndexOf("/"));
-    socket = new WebSocket("ws://" + localUrl);
-
-    socket.onopen = function() {
+    wSocket = new Wocket();
+    //wSocket = new WebSocket("ws://" + localUrl);
+    
+    
+    wSocket.on("connected", function() {
         putScreenMsg("Connected");
-        socket.send(getDataStr({type: "joinSession", data:[sessionId,username]}));
-        putScreenMsg("Joining session " + sessionId + "...");
-    };
+        wSocket.emit("joinSession", sessionId, username);
+        putScreenMsg("Joining session " + sessionId + "...");    
+    });
     
-    socket.onerror = function() {
-        //alert("Socket Error");    
-    };
+    wSocket.on("error", function() {
+        alert("Socket Error");     
+    });
     
-    socket.onmessage = function(message) {
+    wSocket.on("joinError", function(session) {
+        putScreenMsg("Error: The session '" + session + "' no longer exists.");
+        putScreenMsg("");
+        putScreenMsg("<a href=\"" + window.location.href.substring(0,window.location.href.lastIndexOf("/")) + "\">Click here to create a new session</a>");
+        putScreenMsg("<a href=\"javascript: location.reload(true);\">Hard Reload</a>");
+        //socket.disconnect();  //got to verify the correct function and manner to disconnect remote host      
+    });
+    
+    wSocket.on("sessionJoined", function(host, session, connId) {
+        if(session != sessionId) {
+            putScreenMsg("Error: An error ocurred while joining session: '" + session);
+            return;
+        }
         
-        var dataObj = getDataObj(message.data);
-        
-        switch(dataObj.type) {
-                
-            /*case "connect_error":  
-                var error = dataObj.data[0];
-                putScreenMsg("Error while connecting. =\ ");
-            break;*/
-                
-            case "joinError":
-                var session = dataObj.data[0];
-                putScreenMsg("Error: The session '" + session + "' no longer exists.");
-                putScreenMsg("");
-                putScreenMsg("<a href=\"" + window.location.href.substring(0,window.location.href.lastIndexOf("/")) + "\">Click here to create a new session</a>");
-                putScreenMsg("<a href=\"javascript: location.reload(true);\">Hard Reload</a>");
-                //socket.disconnect();  //got to verify the correct function and manner to disconnect remote host                
-            break;
-                
-            case "sessionJoined":
-                var host = dataObj.data[0],
-                    session = dataObj.data[1],
-                    connId = dataObj.data[2];
-                
-                if(session != sessionId) {
-                    putScreenMsg("Error: An error ocurred while joining session: '" + session);
-                    return;
-                }
-        
-                myConnId = connId;
+        myConnId = connId;
 
-                if(host == "") {
-                    //putPanelMsg("Session joined. You are the host.","keepLine");
-                    putPanelMsg("Session joined.","keepLine");
-                    putPanelMsg("");
-                    stopFlashMsgIco();
-                    msgIco.style.opacity = "0.5";
+        if(host == "") {
+            //putPanelMsg("Session joined. You are the host.","keepLine");
+            putPanelMsg("Session joined.","keepLine");
+            putPanelMsg("");
+            stopFlashMsgIco();
+            msgIco.style.opacity = "0.5";
+            focusPanel();
+            clearScreen();
+            
+            //document.getElementById("hostIco").style.display = "inline";
+        } else {
+            hostId = host;
+            putScreenMsg("Session joined");
+            putScreenMsg("Connecting to the host...");
+            
+            requestConnection(hostId);
+                                 
+        }
+                
+        window.onbeforeunload = function() {
+            if(lengthOf(rtcConnections))
+            return "Hey, your session is still active!";       
+        }
+        
+        document.getElementsByTagName("body")[0].style.overflow = "visible";       
+    });
+    
+    wSocket.on("peerData", function(senderId, data) {
+        switch(data.type) {
+                
+            case "connRequest": 
+                
+                if(rtcConnections[senderId]) {
+                    //Got to verify whether this connection is currently active instead of verify whether it exists only
+                    break;
+                }
+                
+                log(data.sdpOffer);
+                rtcConnections[senderId] = new RTCDataChannel(data.sdpOffer);
+                rtcConnections[senderId].onAnswerReady = function(sdpAnswer) {
+                    sendPeerData(senderId, {
+                        type: "connAccepted",
+                        sdpAnswer: hackSDP(sdpAnswer)
+                    });
+                };
+                
+                rtcConnections[senderId].onChannelOpen = function() {
+                    log("CHANNEL OPENED");
+                    if(senderId == hostId) {
+                        //putPanelMsg("Session joined. You are not the host.","keepLine");
+                        if(!newHostFlag) {
+                            putPanelMsg("Session joined.","keepLine");
+                            putPanelMsg("");
+                            stopFlashMsgIco();
+                            msgIco.style.opacity = "0.5";
+                        }
+                        else
+                            newHostFlag = false;
                     focusPanel();
                     clearScreen();
-            
-                    //document.getElementById("hostIco").style.display = "inline";
-                } else {
-                    hostId = host;
-                    putScreenMsg("Session joined");
-                    putScreenMsg("Connecting to the host...");
-            
-                    requestConnection(hostId);
-                                 
-                }
-                
-                window.onbeforeunload = function() {
-                    if(lengthOf(rtcConnections))
-                        return "Hey, your session is still active!";       
-                }
-        
-                document.getElementsByTagName("body")[0].style.overflow = "visible";                
-            break;
-                
-            case "peerData":
-                var senderId = dataObj.data[0],
-                    data = dataObj.data[1];
-         
-                switch(data.type) {
-                
-                    case "connRequest": 
-                
-                        if(rtcConnections[senderId]) {
-                            //Got to verify whether this connection is currently active instead of verify whether it exists only
-                            break;
-                        }
-                
-                        log(data.sdpOffer);
-                        rtcConnections[senderId] = new RTCDataChannel(data.sdpOffer);
-                        rtcConnections[senderId].onAnswerReady = function(sdpAnswer) {
-                            sendPeerData(senderId, {
-                                type: "connAccepted",
-                                sdpAnswer: hackSDP(sdpAnswer)
-                            });
-                        };
-                
-                        rtcConnections[senderId].onChannelOpen = function() {
-                            log("CHANNEL OPENED");
-                            if(senderId == hostId) {
-                                //putPanelMsg("Session joined. You are not the host.","keepLine");
-                                if(!newHostFlag) {
-                                    putPanelMsg("Session joined.","keepLine");
-                                    putPanelMsg("");
-                                    stopFlashMsgIco();
-                                    msgIco.style.opacity = "0.5";
-                                }
-                                else
-                                    newHostFlag = false;
-                                focusPanel();
-                                clearScreen();
-                                //sendRTCData(hostId, 8, "");
-                                SendRTCData(hostId, 8);
-                            } else {
-                                //putPanelMsg("You got a new connection.");
-                            }
+                    //sendRTCData(hostId, 8, "");
+                    SendRTCData(hostId, 8);
+                    } else {
+                        //putPanelMsg("You got a new connection.");
+                    }
                             
-                            rtcConnections[senderId].onChannelClose = function() {
-                                if(senderId == hostId) {
-                                    electNewHost();
-                                    //if the host disconnect, for a while block the page
-                                    //log("The session host has disconnected, the page is now stoped");                      
-                                }
-                                delete rtcConnections[senderId];
-                                log(lengthOf(rtcConnections));
-                                log("RTC ID: " + senderId + " has disconnected.");
-                                //putPanelMsg("Remote connection closed.");
+                    rtcConnections[senderId].onChannelClose = function() {
+                        if(senderId == hostId) {
+                            electNewHost();
+                            //if the host disconnect, for a while block the page
+                            //log("The session host has disconnected, the page is now stoped");                      
+                        }
+                        delete rtcConnections[senderId];
+                        log(lengthOf(rtcConnections));
+                        log("RTC ID: " + senderId + " has disconnected.");
+                        //putPanelMsg("Remote connection closed.");
                                 
 
-                            };
+                    };
                     
-                            rtcConnections[senderId].onMessage = function(data) {
-                                handleData(senderId, data);       
-                            };
+                    rtcConnections[senderId].onMessage = function(data) {
+                        handleData(senderId, data);       
+                    };
                 
-                        };
+                };
                                  
-                        rtcConnections[senderId].onIceCandidate = function(candidate) {
-                            sendPeerData(senderId, {
-                                type: "iceCand",
-                                candidate: candidate
-                            });
-                        };
+                rtcConnections[senderId].onIceCandidate = function(candidate) {
+                    sendPeerData(senderId, {
+                        type: "iceCand",
+                        candidate: candidate
+                    });
+                };
         
-                        rtcConnections[senderId].createAnswer();
-                        //rtcConnections[senderId].onChannelClose = function(){log("CHANNEL CLOSED");};
-                        break;
+                rtcConnections[senderId].createAnswer();
+                //rtcConnections[senderId].onChannelClose = function(){log("CHANNEL CLOSED");};
+                break;
             
               
-                    case "iceCand":
-                        log(data.candidate);
-                        rtcConnections[senderId].addIceCandidate(data.candidate);
-                        break;
+            case "iceCand":
+                log(data.candidate);
+                rtcConnections[senderId].addIceCandidate(data.candidate);
+                break;
 
-                    case "connAccepted":
-                        log(data.sdpAnswer);
-                        rtcConnections[senderId].setRemoteDescription(data.sdpAnswer);
-                        rtcConnections[senderId].onChannelOpen = function() {
-                            log("CHANNEL OPENED");
+            case "connAccepted":
+                log(data.sdpAnswer);
+                rtcConnections[senderId].setRemoteDescription(data.sdpAnswer);
+                rtcConnections[senderId].onChannelOpen = function() {
+                    log("CHANNEL OPENED");
                     
-                            if(senderId == hostId) {
-                                //putPanelMsg("Session joined. You are not the host.","keepLine");
-                                if(!newHostFlag) {
-                                    putPanelMsg("Session joined.","keepLine");
-                                    putPanelMsg("");
-                                    stopFlashMsgIco();
-                                    msgIco.style.opacity = "0.5";
-                                }
-                                else
-                                    newHostFlag = false;
+                    if(senderId == hostId) {
+                    //putPanelMsg("Session joined. You are not the host.","keepLine");
+                        if(!newHostFlag) {
+                            putPanelMsg("Session joined.","keepLine");
+                            putPanelMsg("");
+                            stopFlashMsgIco();
+                            msgIco.style.opacity = "0.5";
+                        }
+                        else
+                            newHostFlag = false;
                                 
-                                focusPanel();
-                                clearScreen();
-                                //sendRTCData(hostId, 8, "");
-                                SendRTCData(hostId, 8);
-                            } else {
-                                //putPanelMsg("You got a new connection!");
-                            }
-                            
-                            rtcConnections[senderId].onChannelClose = function() {
-                                if(senderId == hostId){
-                                    electNewHost();
-                            
-                                    //if the host disconnect, for a while block the page
-                                    //log("The session host has disconnected, the page is now stoped");
-
-                                }
-                                delete rtcConnections[senderId];
-                                log(lengthOf(rtcConnections));
-                                log("RTC ID: " + senderId + " has disconnected.");
-                                //putPanelMsg("Remote connection closed.");
-                                
-                            };
-                    
-                            rtcConnections[senderId].onMessage = function(data) {
-                                handleData(senderId, data);    
-                            };
-                
-                        };
-                        //rtcConnections[senderId].onChannelClose = function(){log("CHANNEL CLOSED");};
-                    break;
-                
-                    default:
-                        log("Data not handled. ID: " + senderId + " Data: " + data);
-          
-                }
-            break;
-                
-            case "peerDataError":
-                var destId = dataObj.data[0],
-                    data = dataObj.data[1];
-                putScreenMsg("Error: Connection to the host has failed =(");
-                //alert("Error while sending data to " + destId);        
-            break;
-                
-            case "newHost":
-                
-                var newHostId = dataObj.data[0];
-                newHostFlag = true;
-                log("new host" + newHostId);
-        
-                if(newHostId == "") {
-                    //writeMessage("Session Joined. You are the host.");
-                    //putPanelMsg("New host arrived. You are the new host");
-                    //putPanelMsg("");
-                    focusPanel();
-                    clearScreen();
-                    hostId = null;
-            
-                    //document.getElementById("hostIco").style.display = "inline";
-            
-                } else {
-                    hostId = newHostId;
-                    //putScreenMsg("New host arrived");
-            
-                    if(rtcConnections[newHostId]){
-                        //putPanelMsg("You are connnected to the new host");
                         focusPanel();
                         clearScreen();
-                        return;        
+                        //sendRTCData(hostId, 8, "");
+                        SendRTCData(hostId, 8);
+                    } else {
+                        //putPanelMsg("You got a new connection!");
                     }
-                    unfocusPanel();
-                    putScreenMsg("Connecting to the new host...");
-                    
-                    //writeMessage("Session Joined. You are not the host.");
-            
-                    requestConnection(newHostId);
-                                 
-                }                
-            break;
-                
-            case "peerClosure":
-                if(hostId) //if got host id, means you not are the host, breaks
-                    break;
-                
-                var closeId = dataObj.data[0];
-                broadcastData(myConnId,80,closeId);
-                
-                if(rtcConnections[closeId]) //check if this peer got any connection with the host
-                    rtcConnections[closeId].close();  //if so close it
-                
-                for(var fileId in RemoteFiles) {    //iterate thru all the disconnected client files
-                    if(RemoteFiles[fileId].FileOwnerId == closeId) {   //check if the file belongs to the connection
-                        DeleteRemoteFile(fileId);
-                        
-                        if(currDownload && currDownload.id == fileId)
-                            currDownload.CancelDownload();
-                        else
-                            DeleteIcon(fileId); //remove the file icon
-                    }
-                }
+                            
+                    rtcConnections[senderId].onChannelClose = function() {
+                        if(senderId == hostId){
+                            electNewHost();
+                            
+                            //if the host disconnect, for a while block the page
+                            //log("The session host has disconnected, the page is now stoped");
 
+                        }
+                        delete rtcConnections[senderId];
+                        log(lengthOf(rtcConnections));
+                        log("RTC ID: " + senderId + " has disconnected.");
+                        //putPanelMsg("Remote connection closed.");
+                                
+                    };
+                    
+                    rtcConnections[senderId].onMessage = function(data) {
+                        handleData(senderId, data);    
+                    };
+                
+                };
+                //rtcConnections[senderId].onChannelClose = function(){log("CHANNEL CLOSED");};
                 break;
                 
             default:
-                log(dataObj);
-                alert("Data Received not handled. Type: " + dataObj.type);
-        }        
-    }
-
+                log("Data not handled. ID: " + senderId + " Data: " + data);
+          
+        }    
+    });
+    
+    wSocket.on("peerDataError", function(destId, data) {
+        putScreenMsg("Error: Connection to the host has failed =(");
+        //alert("Error while sending data to " + destId);     
+    });
+    
+    wSocket.on("newHost", function(newHostId) {
+        newHostFlag = true;
+        log("new host" + newHostId);
+        
+        if(newHostId == "") {
+            //writeMessage("Session Joined. You are the host.");
+            //putPanelMsg("New host arrived. You are the new host");
+            //putPanelMsg("");
+            focusPanel();
+            clearScreen();
+            hostId = null;
+            
+        //document.getElementById("hostIco").style.display = "inline";
+            
+        } else {
+            hostId = newHostId;
+            //putScreenMsg("New host arrived");
+            
+            if(rtcConnections[newHostId]){
+                //putPanelMsg("You are connnected to the new host");
+                focusPanel();
+                clearScreen();
+                return;        
+            }
+            unfocusPanel();
+            putScreenMsg("Connecting to the new host...");
+                    
+            //writeMessage("Session Joined. You are not the host.");
+            
+            requestConnection(newHostId);
+                                 
+        }          
+    });
+    
+    wSocket.on("peerClosure", function(closeId) {
+        if(hostId) //if got host id, means you not are the host, breaks
+            return;
+        
+        broadcastData(myConnId,80,closeId);
+                
+        if(rtcConnections[closeId]) //check if this peer got any connection with the host
+            rtcConnections[closeId].close();  //if so close it
+                
+        for(var fileId in RemoteFiles) {    //iterate thru all the disconnected client files
+            if(RemoteFiles[fileId].FileOwnerId == closeId) {   //check if the file belongs to the connection
+                DeleteRemoteFile(fileId);
+                        
+                if(currDownload && currDownload.id == fileId)
+                    currDownload.CancelDownload();
+                else
+                    DeleteIcon(fileId); //remove the file icon
+            }
+        }
+    });
+    
+    wSocket.connect("ws://" + localUrl);
 }
 
 function requestConnection(remoteId) {
@@ -480,7 +452,7 @@ function requestConnection(remoteId) {
 
 function sendPeerData(destId, data) {
     //in the future, maybe use query id
-    socket.send(getDataStr({type:"peerData",data:[destId, sendSession, data]}));
+    wSocket.emit("peerData", destId, sendSession, data);
 }
 
 function electNewHost() {
