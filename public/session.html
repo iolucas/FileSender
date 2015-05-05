@@ -9,145 +9,57 @@
     </head>
     
     <body>
-        <div id="focus">
-            <img src="img/logo4.png"><br><br>
-<!--            <img src="img/loading.gif" style="height:100px;width:100px;"><br><br>-->
-            <div id="userChoose">
-                <span>Enter a username:<br></span>
-                <input id="userInput" type="text" placeholder="E.g. Lucas" maxlength="20"><button onclick="setUserAndStart();">OK</button>
-            </div>
-            <span id="focusMessage"></span>
-        </div>
-        
-        <div id="alerts"></div>
         
         <header>
-            <nav id="leftNav">
-                <img id="logoIco" src="img/logo_ico.png">
-<!--                <img id="hostIco" src="img/host_ico.png">-->
-                <img id="hostIco">
-            </nav>
-            
-            <nav id="rightNav">
-<!--                <img src="img/copy_ico.png">-->
-                <img id="trashIco" src="img/trash_ico.png" style="display: none" onclick="DeleteFiles();">
-                <img id="msgIco" src="img/msg_ico.png">
-                <img src="img/browse_ico.png" onclick="document.getElementById('files').click();">
-                <img id="menu-ico" src="img/menu_ico2.png">
-                <input type="file" id="files" multiple>
-            </nav>
+            <img class="logo" src="img/logo.png">         
+            <table class="user">
+                <tr><td rowspan="2" class="icoCol"><img id="userImg" src="img/mob.png"></td><td id="userName">Lucas</td></tr>
+                <tr><td id="sessionName">@goodie849</td></tr>
+            </table>           
         </header>
         
         <section>
-            <div id="msgPanel">
-                <textarea id="displayMsg" readonly disabled></textarea>
-                <button type="button" id="sendButton" onclick="sendText();">Send</button>
-                <textarea id="inputArea" placeholder=""></textarea>
-            </div>  
-            <div id="main-menu">               
-                <div id="about-menu" class="menu-item">About</div>            
+            
+            <div class="device">
+                <div class="mainDev">
+                    <img class="devIco" src="img/comp.png">
+                    <img class="upIco" src="img/up.png">
+                    <table class="mainDevTable">
+                        <tr><td class="devName">Lucas-Computer</td></tr>
+                        <tr><td class="devOrigin">Dispositivo Local</td></tr>
+                    </table>
+                </div>
+                <div class="devDown">
+                    <img class="downCanIco" src="img/down.png">
+                    <img class="downCanIco" src="img/cancel.png">
+                    <table class="upDownTable">
+                        <tr><td class="upDownData">My Text File.txt</td></tr>
+                        <tr><td class="upDownData">8kb</td></tr>
+                    </table>
+                </div>
             </div>
-            <div id="about-section">
-                <img src="img/logo4.png"><br><br>
-                <div>
-                    Qeek.me is a web application for transfer files and information with a direct connection between browsers. Just type the same address of this page in another browser to create a direct connection and share your things.
-                </div><br>
-                <a href="mailto: qeek@qeek.me">qeek@qeek.me</a>
-                <br><br><br>
-                <span id="about-button" onclick="hideAbout();">Ok</span>
-                <br><br>       
+                
             </div>
+            
+            <div class="device">
+                <div class="mainDev">
+                    <img class="devIco" src="img/mob.png">
+                    <img class="upIco" src="img/up.png">
+                    <table class="mainDevTable">
+                        <tr><td class="devName">Lucas-Cel</td></tr>
+                        <tr><td class="devOrigin">Dispositivo de Sessão</td></tr>
+                    </table>
+                </div>
+                <div class="devUp">  
+                    <img class="downCanIco" src="img/cancel.png">
+                    <table class="upDownTable">
+                        <tr><td class="upDownData">My Text File.txt</td></tr>
+                        <tr><td class="upDownData">8kb</td></tr>
+                    </table>
+                </div>
+            </div>
+            
+
         </section>
-<!--    <table>
-            <tr><td rowspan="3" class="icon"><img src="icon_file.png"></td><td colspan="2" class="fileName">My archive.txt</td></tr>
-            <tr><td colspan="2">Text Archive</td></tr>
-            <tr><td>8 kb</td><td class="downloadInfo">Click for download</td></tr>
-        </table>-->
-
-
-        <script src="Wocket.js"></script>
-        <script src="misc.js"></script>
-        <script src="downloadManager.js"></script>
-        <script src="fileManager.js"></script>
-        
-        <script src="IconManager.js"></script>
-        <script src="rtcconn.js"></script>
-        <script src="idb.filesystem.min.js"></script>
-        <script src="main.js"></script>
-        
-        <script>
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-            ga('create', 'UA-60400657-1', 'auto');
-            ga('send', 'pageview');
-            
-            var menuOpened = false;
-            
-            document.body.addEventListener("click", function() {
-                if(menuOpened)
-                    hideMenu();
-            });
-            
-            document.getElementById("menu-ico").addEventListener("click", function(e) {
-                if(!menuOpened) {
-                    e.cancelBubble = true;  //cancel bubble to prevent body click event to happen due to event continues to propagate to parent elements
-                    showMenu();  
-                }
-            });
-            
-            document.getElementById("about-menu").addEventListener("click", function() {
-                showAbout();  
-            });
-            
-            window.onload = function() {                
-                var user = getCookie("username");   //check if a cookie for the username exists                
-                if(user != "")  //if it does exists, 
-                    start(user);    //starts the application with the username speficified
-                else {    //if not,
-                    document.getElementById("userChoose").style.display = "block";  //display the screen to insert a username
-                    document.getElementById("userInput").focus();
-                }
-            };
-            
-            function setUserAndStart() {
-                var textValue = document.getElementById("userInput").value;
-                
-                if(textValue == "")
-                    return;
-                
-                document.getElementById("userChoose").style.display = "none";
-                setCookie("username",textValue,360);
-                
-                start(textValue);
-            }
-            
-            function start(user) {
-                checkCompatibilityAndStart(window.location.pathname.substr(1), user);   //start the application with the room id and username
-            }
-            
-            function showMenu() {
-                document.getElementById("main-menu").style.display = "block";
-                document.getElementById("menu-ico").style.opacity = "1";
-                menuOpened = true;
-            }
-            
-            function hideMenu() {
-                document.getElementById("main-menu").style.display = "none";
-                document.getElementById("menu-ico").style.opacity = "0.5";
-                menuOpened = false;
-            }
-            
-            function showAbout() {
-                document.getElementById("about-section").style.display = "block";
-            }
-            
-            function hideAbout() {
-                document.getElementById("about-section").style.display = "none";
-            }
-            
-        </script>
     </body>   
 </html>

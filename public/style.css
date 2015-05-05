@@ -7,11 +7,7 @@ html, body {
 }
 
 body {
-/*    background-image: linear-gradient(#004000,#2c612c);*/
-/*    background-image: linear-gradient(#004000,#fff);*/
-/*    background-image: linear-gradient(#888,#ddd,#888);*/
     background-image: linear-gradient(135deg,rgb(174,167,159),#e8e8e8,rgb(174,167,159));
-/*    background-image: linear-gradient(135deg,#000 30%,#004000, #fff);*/
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -26,277 +22,139 @@ body {
     user-select: none;   
 }
 
-#focus {
-    position: absolute;
-    top:0;
-    left:0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,.95);
-    text-align: center;
-    padding-top: 50px;
-    box-sizing: border-box;
-    
-    /*display: none;*/
-    
-    z-index: 1001;
-}
-
-#focus img{
-    width: 200px;    
-}
-
-#userChoose {
-    display: none;
-    
-}
-
-#focusMessage {
-    font-size: 20pt;
-    color: #ddd;
-}
-
-#alerts {
-    height: 20px;
-    background-color: #f00;
-    color: #fff;
-    text-align: center;
-    display: none;
-}
-
 header {
     background-color: #000;
-/*    background-image: url(logo_ico.png);
-    background-repeat: no-repeat;
-    background-size: auto 36px;
-    background-position: 5px 8px;*/
-    height: 50px;
-/*    text-align: right;*/
-    margin-bottom: 2px;
-/*    box-shadow: 0px 1px 2px rgba(0,0,0,.8);*/
+    height: 61px;
 }
 
-#leftNav, #rightNav {
-    border: 0px solid white;
-    box-sizing: border-box;
-    height: 100%;    
-}
-
-#leftNav { float: left; }
-#logoIco {
-    height: calc(100% - 10px);
-    margin: 5px 0px 0px 5px;
-}
-/*
-#hostIco {
-    height: calc(100% - 20px);
-    margin: 10px 0px 0px 5px;
-    vertical-align: top;
-    display: none;
-}
-*/
-
-
-#rightNav { float: right; }
-#rightNav img {
-    height: calc(100% - 25px);
-    margin: 13px 15px 0px 0px;
-    cursor: pointer;
-}
-
-#msgIco {
-   opacity: .5;  
-}
-
-#files {  
-    display: none;  
-}
-
-#menu-ico {
-   opacity: .5;  
-}
-
-section {
-    position: relative;
-    height: calc(100% - 52px);
-}
-
-#msgPanel {
-    position: absolute;
-    background-color: rgba(0,0,0,.8);
+.logo {
     height: 100%;
-    width: 100%;
-    display: none;
-    transition-duration: 0.2s;
+    padding: 5px;
+    box-sizing: border-box;    
 }
 
-#displayMsg {
-    position: relative;
-    background-color: transparent;
-    height: calc(100% - 75px);
-    width: 100%;
-    margin-bottom: 0px;
-    overflow-y: visible;
-    border: 0px solid white;
-    box-sizing: border-box;
-    color: white;
-    
-    font-size: 14pt;
-    font-family: 'Calibri';
-    
-   resize: none;
-    
-    z-index: 1000;
-    
-}
-#sendButton {
-    
-    position: absolute;
-    bottom: 1px;
-    right: 0;
-    height: 60px;
-    width: 60px;
-    font-size: 12pt;
-    text-align: center;
-    margin-top: 5px; 
-}
+/*  User Menu Style */
 
-#inputArea {
-    position: absolute;
-    bottom: 1px;
-    width: calc(100% - 61px);
-    height: 60px;
-    resize: none;
-    margin: 0;
-    font-family: 'Calibri';
-    font-size: 14pt;
-    background-color: rgba(255,255,255,.8);
-    box-sizing: border-box;
-    padding-left: 5px;
-    border: 0px solid #111;
-}
-
-#main-menu {
-    top: -2px;
-    right: 0;
-    position: absolute;
-    height: auto;
-    width: 100px;
-    background-color: #000;
-    box-shadow: 0px 1px 2px rgba(0,0,0,.8);
-    box-sizing: border-box;
-    border: 0px solid #444;
-    display: none;
-}
-
-.menu-item {
-    color: #fff;   
-    font-size: 10pt;
-    background-image: linear-gradient(#333,#000);
-    text-align: left;
-    padding-left: 10px;
-    height: 45px;
-    line-height: 45px;
-    
-    cursor: pointer;
-}
-
-#about-section {
-    background-color: rgba(0,0,0,.8);
-    box-shadow: 2px 2px 3px rgba(0,0,0,.8);
-    width: calc(100% - 100px);
-    border-radius: 5px;
-    position: absolute;
-    text-align: center;
-    padding: 10px;
-    margin-left: 50px;
-    margin-right: 50px;
-    box-sizing: border-box;
-    display: none;
-}
-
-#about-section img {
-    width: 120px;
-}
-
-#about-section div {
-    font-size: 10pt;
-    text-align: justify;
-    line-height: 15pt;
-}
-
-#about-section a {
-    font-size: 10pt;
-    color: #fff;
-    text-decoration: none;
-}
-
-#about-button {
-    padding: 5px 20px 5px 20px;
-    border: 1px solid #fff;
-    font-size: 8pt;
-
-}
-
-
-
-
-/*table, tr, td {    
-    border: 1px solid blue;
-    box-sizing: border-box;
-}*/
-
-
-table {
-    height: 50px;
-    box-sizing: border-box;
-
-    font-size: 8pt;
-    text-shadow: 0px 0px 2px #000;
-    line-height: 0px;
-    
-    padding: 2px;
-        
-    background: rgba(0,0,0,.2);
-    background-image: linear-gradient(#004000, #0f0);
-
-    background-size: 0% 100%;
-    background-repeat: no-repeat;
-    
-    margin: 2px;
-    border-radius: 5px;
-    cursor: pointer;
-    border: 1px solid rgba(0,0,0,.5);
-    width: calc(100% - 4px);
-}
-
-.icon {
-    width: 1px;
-}
-
-td img {
-    height: 30px;
-    padding: 0px 5px 2px 5px;
-}
-
-.fileName {
-    font-size: 10pt;
-    height: 15px;
-    max-width: 1px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.iconTxt {
+.user {
+    height: 100%;
+    background-color: #222;
+    float: right;
     text-align: right;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
-.sizeCol {
-    width: 75px;
-    text-align: left;
+#userImg {
+    height: 40px;
 }
 
-.fileOwnerCol {
-    text-align: right;    
+.icoCol {
+    width: 1px;
+    position: relative;
+    top: 2px;
 }
+
+#userName {
+    font-size: 20px;
+    position: relative;
+    top: 2px;
+}
+
+#sessionName {
+    font-size: 15px;
+    color: #ddd;
+    position: relative;
+    top: -4px;
+}
+
+
+
+
+/*  Devices Styles  */
+
+.device {
+    margin: 10px 5px 0px 5px;
+    width: calc(100% - 10px);
+    text-shadow: 0px 0px 2px #000;
+}
+
+.mainDev {
+    height: 80px;    
+    background-color: #555;
+}
+
+.devUp {
+    height: 60px;
+    background-color: #aaa;
+    border-top: 0px solid #fff;
+    
+    background-image: linear-gradient(#ffafff, #f0f);
+
+    background-size: 30% 100%;
+    background-repeat: no-repeat;
+}
+
+.devDown {
+    height: 60px;
+    background-color: #777;
+    border-top: 0px solid #fff;
+    background-image: linear-gradient(#004000, #0f0);
+    
+
+    background-size: 67% 100%;
+    background-repeat: no-repeat;
+}
+
+.devIco {
+    height: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    float: left;
+}
+
+.upIco {
+    height: 100%;
+    box-sizing: border-box;
+    padding: 15px;
+    float: right;
+}
+
+.downCanIco {
+    height: 100%;
+    box-sizing: border-box;
+    padding: 5px;
+    float: right;
+    padding-right: 15px;
+}
+
+.mainDevTable {
+    border: 0px solid blue;
+    padding-top: 15px;
+}
+
+.devName {
+    font-size: 17px;
+}
+
+.devOrigin {
+    font-size: 12px;
+}
+
+.upDownTable {
+    border: 0px solid blue;
+    height: 100%;
+/*    width: calc(100% - 120px);*/
+}
+
+.upDownData {
+    border: 0px solid blue;
+    
+}
+
+.teste {
+    float: right;
+    line-height: 55px;
+    margin-right: 20px;
+    
+}
+

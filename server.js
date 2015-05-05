@@ -25,10 +25,14 @@ app.use(express.static("public"));
     
 //CREATE NEW SESSION AND RESPOND GET/ WITH THE SESSION CREATED
 app.get("/", function(req, res) {
-    var newSession = createSession();
+    res.sendFile(__dirname + "/public/session.html");
+    
+    
+    
+    /*var newSession = createSession();
     log("New session created: " + newSession);    
     //res.redirect("https://b.qeek.me/" + newSession);
-    res.redirect(newSession); 
+    res.redirect(newSession); */
 });
 
 //CHECK IF THE REQUESTED GET/* PATH EXISTS, IF SO, RETURN INDEX, IF NOT, RETURN ERROR     
