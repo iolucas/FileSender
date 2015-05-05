@@ -13,53 +13,31 @@
         <header>
             <img class="logo" src="img/logo.png">         
             <table class="user">
-                <tr><td rowspan="2" class="icoCol"><img id="userImg" src="img/mob.png"></td><td id="userName">Lucas</td></tr>
+                <tr><td rowspan="2" class="icoCol"><img id="userImg" src="img/mob.png"></td><td id="userName">Lucas-Mobile</td></tr>
                 <tr><td id="sessionName">@goodie849</td></tr>
             </table>           
         </header>
         
-        <section>
-            
+        <section>            
             <div class="device">
-                <div class="mainDev">
-                    <img class="devIco" src="img/comp.png">
-                    <img class="upIco" src="img/up.png">
-                    <table class="mainDevTable">
-                        <tr><td class="devName">Lucas-Computer</td></tr>
-                        <tr><td class="devOrigin">Dispositivo Local</td></tr>
-                    </table>
-                </div>
-                <div class="devDown">
-                    <img class="downCanIco" src="img/down.png">
-                    <img class="downCanIco" src="img/cancel.png">
-                    <table class="upDownTable">
-                        <tr><td class="upDownData">My Text File.txt</td></tr>
-                        <tr><td class="upDownData">8kb</td></tr>
-                    </table>
-                </div>
-            </div>
-                
+                <table class="mainDevice">
+                    <tr>
+                        <td class="mainImgTd"><img src="img/comp.png" class="mainImg"></td>
+                        <td class="deviceName">Lucas-PC<br><span>Dispositivo Local</span></td>
+                        <td class="mainImgTd"><img src="img/up.png" class="uploadImg" onclick="alert('oi');"></td>
+                    </tr>                   
+                </table>                
+                <table class="upload">
+                    <tr><td class="fileTitle">Enviando: MeuArquivo.txt</td><td class="cancel" rowspan="2"><img src="img/cancel.png" class="cancelImg"></td></tr>
+                    <tr><td>25/50kb - 50%</td></tr>
+                </table>                          
+                <table class="download">
+                    <tr><td>Recebendo: MinhaImagem.png</td><td class="cancel" rowspan="2"><img src="img/cancel.png" class="cancelImg"></td></tr>
+                    <tr><td>30/100kb - 30%</td></tr>
+                </table> 
             </div>
             
-            <div class="device">
-                <div class="mainDev">
-                    <img class="devIco" src="img/mob.png">
-                    <img class="upIco" src="img/up.png">
-                    <table class="mainDevTable">
-                        <tr><td class="devName">Lucas-Cel</td></tr>
-                        <tr><td class="devOrigin">Dispositivo de Sessão</td></tr>
-                    </table>
-                </div>
-                <div class="devUp">  
-                    <img class="downCanIco" src="img/cancel.png">
-                    <table class="upDownTable">
-                        <tr><td class="upDownData">My Text File.txt</td></tr>
-                        <tr><td class="upDownData">8kb</td></tr>
-                    </table>
-                </div>
-            </div>
             
-
         </section>
     </body>   
 </html>

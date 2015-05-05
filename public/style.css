@@ -78,83 +78,84 @@ header {
     text-shadow: 0px 0px 2px #000;
 }
 
-.mainDev {
+.mainDevice {
     height: 80px;    
     background-color: #555;
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.devUp {
-    height: 60px;
-    background-color: #aaa;
-    border-top: 0px solid #fff;
-    
+.mainImgTd {
+    width: 1px;        
+}
+
+.mainImg {
+    height: 60px;    
+    box-sizing: border-box;
+    margin: 5px 8px 0px 8px;
+}
+
+.uploadImg {
+    height: 50px;    
+    margin: 5px 10px 0px 8px;      
+}
+
+.deviceName {
+    max-width: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 17px; 
+}
+
+.deviceName span {
+    font-size: 12px; 
+}
+
+.upload, .download {
+    height: 60px;    
+    width: 100%;
+    border-collapse: collapse;
+    background-repeat: no-repeat;
+    background-size: 30% 100%; 
+}
+
+.upload {
     background-image: linear-gradient(#ffafff, #f0f);
-
-    background-size: 30% 100%;
-    background-repeat: no-repeat;
+    background-color: #aaa;
 }
 
-.devDown {
-    height: 60px;
-    background-color: #777;
-    border-top: 0px solid #fff;
+.download {
     background-image: linear-gradient(#004000, #0f0);
-    
-
-    background-size: 67% 100%;
-    background-repeat: no-repeat;
+    background-color: #777;
 }
 
-.devIco {
-    height: 100%;
-    box-sizing: border-box;
-    padding: 10px;
-    float: left;
-}
 
-.upIco {
-    height: 100%;
-    box-sizing: border-box;
-    padding: 15px;
-    float: right;
-}
-
-.downCanIco {
-    height: 100%;
-    box-sizing: border-box;
-    padding: 5px;
-    float: right;
-    padding-right: 15px;
-}
-
-.mainDevTable {
-    border: 0px solid blue;
-    padding-top: 15px;
-}
-
-.devName {
-    font-size: 17px;
-}
-
-.devOrigin {
+.upload td, .download td {
+    height: 50%;
+    padding-left: 5px;
     font-size: 12px;
 }
 
-.upDownTable {
-    border: 0px solid blue;
+.fileTitle {
+    max-width: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;       
+}
+
+.cancel {
+    background-color: rgba(128,0,0,0);    
+    text-align: center;
+    width: 1px;
     height: 100%;
-/*    width: calc(100% - 120px);*/
 }
 
-.upDownData {
-    border: 0px solid blue;
-    
+.cancelImg {
+    height: 40px;    
+    margin: 3px 14px 0px 3px;         
 }
 
-.teste {
-    float: right;
-    line-height: 55px;
-    margin-right: 20px;
-    
-}
+
+
 
