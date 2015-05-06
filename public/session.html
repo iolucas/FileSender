@@ -9,114 +9,41 @@
     </head>
     
     <body>
-        <div id="message"><button onclick="createIcon();">Teste</button>Procurando dispositivos...</div>
-
+        <div id="message"></div>       
+        
         <header>
             <img class="logo" src="img/logo.png">         
             <table id="user">
-                <tr><td rowspan="2" class="icoCol"><img id="userImg" src="img/mob.png"></td><td id="userName">Lucas-Mobile</td></tr>
-                <tr><td id="sessionName">@goodie849</td></tr>
+                <tr>
+                    <td rowspan="2" class="icoCol"><img id="userImg" src="img/mob.png"></td>
+                    <td id="userName"></td>
+                </tr>
+                <tr><td id="sessionName"></td></tr>
             </table>           
         </header>
         
-        <section id="section">            
-<!--            <div class="device">
-                <table class="mainDevice">
-                    <tr>
-                        <td class="mainImgTd"><img src="img/comp.png" class="mainImg"></td>
-                        <td class="deviceName">Lucas-PC<br><span>Dispositivo Local</span></td>
-                        <td class="mainImgTd"><img src="img/up.png" class="uploadImg" onclick="alert('oi');"></td>
-                    </tr>                   
-                </table>
-                <table class="transfer">
-                    <tr><td colspan="2">Enviando: Text Mobile.txt</td></tr>
-                    <tr><td colspan="2" class="upBar">50%</td></tr>
-                    <tr><td>45,5kb / 91kb</td><td class="cancel">Segure para Cancelar</td></tr>
-                </table>
-                <table class="transfer">
-                    <tr><td colspan="2">Recebendo: Text Mobile.txt</td></tr>
-                    <tr><td colspan="2" class="downBar">50%</td></tr>
-                    <tr><td>45,5kb / 91kb</td><td class="cancel">Segure para Cancelar</td></tr>
-                </table>
-            </div>   --> 
-            
-            <table class="screenDisabled" style="display: none;">
-                <tr><td>
-                    <table class="popupWindow">
-                        <tr>
-                            <td class="mainImgTd" style="height: 1px;"><img src="img/comp.png" class="mainImg"></td>
-                            <td class="deviceName">Lucas-PC<br><span>Dispositivo Local</span></td>
-                        </tr>
-                        <tr><td colspan="2" style="height: 1px;">Quer te enviar o arquivo:</td></tr>
-                        <tr><td colspan="2" style="height: 1px;">Meu Video.wmv<br>675kb</td></tr>
-                        <tr>
-                            <td colspan="2">
-                                <span class="popupButton">Recusar</span>
-                                <span class="popupButton">Aceitar</span>
-                            </td>
-                        </tr>
-                    </table>
-                </td></tr>        
-            </table>
-            
-            
-<!--            <table class="screenDisabled">
-                <tr><td>
-                    <div class="popupWindow">
-                        <img src="img/comp.png" class="mainImg"><br>
-                        Lucas-PC quer te enviar o arquivo:<br><br>
-                        Meu Video.wmv<br>
-                        85kb<br><br>
-                        <span class="popupButton">Recusar</span><span class="popupButton">Aceitar</span>
-                    </div>
-                </td></tr>        
-            </table>-->
-            
-            <table class="screenDisabled" style="display: none;">
+            <table id="welcome" class="screenDisabled" style="display:none;">
                 <tr><td>
                     <div class="popupWindow">          
                         Bem vindo! <br><br>Insira seu nome para ser identificado por outros dispositivos:<br>
-                        <input type="text" placeholder="Ex.: Lucas-PC, Junior-Cel"><br>
-                        <input type="checkbox"> Aceito os <a href="#">Termos de Uso</a><br>
-                        <div class="popupButton">OK</div>
+                        <input id="userInput" type="text" maxlength="20" placeholder="Ex.: Lucas-PC, Junior-Cel"><br>
+                        <input id="terms" type="checkbox"> Aceito os <a href="#">Termos de Uso</a><br>
+                        <div class="popupButton" onclick="setUserAndStart();">OK</div>
                     </div>
                 </td></tr>        
+            </table>  
+        
+        <section id="section">
+            <table id="menu">
+<!--            <tr><td>Configuração</td></tr> -->
+                <tr><td>Sobre</td></tr>        
             </table>
-            
         </section>
-        <script>
-            window.onload = function() {
-                SetLocalUser("Lucas-PC","hunting234","");    
-            };
-            
-            
-            function createIcon() {
-                ShowPopup(document.getElementById("section"),
-                          "Lucas-PC",
-                          "Dispositivo Local",
-                          "pc",
-                          "Quer te enviar o arquivo:",
-                          "Meu Video.wmv",
-                          "85kb",
-                          "Aceitar", "Recusar",
-                          function(){alert("aceito!");},function(){alert("Recusado!");});
-                /*ShowPopup(document.getElementById("section"), "<img src='img/comp.png' class='mainImg'><br>Lucas-PC quer te enviar o arquivo:<br><br>Meu Video.wmv<br>85kb<br><br>", function(){alert("aceito!");},function(){alert("Recusado!");});*/
-                
-                /*var ae = new DeviceIcon(document.getElementById("section"), "Lucas-PC", "Dispositivo Local", "pc", function(target){
-                    
-                    target.DeleteDevice();
-                
-                }, function(){alert("Cancel Down");}, function(){alert("Cancel Up");});*/
-                //ae.setDownloadName("Lucas.exe");
-                //ae.setDownloadProgress(230000, 240000);
-                
-                //ae.setUploadName("Lucas.bat");
-                //ae.setUploadProgress(2400000, 24000000);
-                
-                //ae.showDownload();
-                //ae.showUpload();
-            }      
-        </script>
+        
+        <script src="Wocket.js"></script>
         <script src="layout.js"></script>
+        <script src="rtcconn.js"></script>
+        <script src="misc.js"></script>
+        <script src="main.js"></script>
     </body>   
 </html>

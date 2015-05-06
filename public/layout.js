@@ -1,7 +1,44 @@
-function DeviceIcon(parent, deviceName, deviceOrigin, deviceType, uploadCallback, cancelDownCallback, cancelUpCallback) {
+var menuOpened = false; 
+//set menu stuff
+document.body.addEventListener("click", function() {
+    if(menuOpened) {
+        HideMenu();
+        menuOpened = false;    
+    }
+});  
+
+document.getElementById("user").addEventListener("click", function(e) {
+    if(!menuOpened) {
+        //cancel bubble to prevent body click event to happen due to event continues to propagate to parent elements
+        e.cancelBubble = true;
+        menuOpened = true; 
+        ShowMenu();  
+    }
+});
+
+function ShowMessage(message, backColor) {
+    if(!backColor)
+        backColor = "#00a";    
+    document.getElementById("message").style.backgroundColor = backColor;
+    document.getElementById("message").innerHTML = message;
+    document.getElementById("message").style.display = "block";    
+}
+
+function ShowTempMessage(message, backColor, time) {
+    ShowMessage(message, backColor);
+    setTimeout(function() {
+        HideMessage();    
+    }, time);
+}
+
+function HideMessage() {
+    document.getElementById("message").style.display = "none";   
+}
+
+function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancelDownCallback, cancelUpCallback) {
     
     var self = this;
-    
+    var parent = document.getElementById("section");
     var newDevice = document.createElement("div");
     newDevice.setAttribute("class", "device");
     
@@ -233,7 +270,8 @@ function SetLocalUser(localName, sessionName, deviceType) {
     document.getElementById("user").style.display = "table";
 }
 
-function ShowPopup(parent, deviceName, deviceOrigin, deviceType, message, fileName, fileSize, acceptLabel, refuseLabel, acceptCallback, refuseCallback){    
+function ShowPopup(deviceName, deviceOrigin, deviceType, message, fileName, fileSize, acceptLabel, refuseLabel, acceptCallback, refuseCallback){   
+    var parent = document.body;
     var table = document.createElement("table");
     table.setAttribute("class", "screenDisabled");    
     var imgSrc = "";   
@@ -244,13 +282,26 @@ function ShowPopup(parent, deviceName, deviceOrigin, deviceType, message, fileNa
     else
         imgSrc = "img/comp.png";    
     table.innerHTML = "<tr><td><table class='popupWindow'><tr><td class='mainImgTd' style='height: 1px;'><img src='" + imgSrc + "' class='mainImg'></td><td class='deviceName'>" + deviceName + "<br><span>" + deviceOrigin + "</span></td></tr><tr><td colspan='2' style='height: 1px;'>" + message + "</td></tr><tr><td colspan='2' style='height: 1px;'>" + fileName + "<br>" + fileSize + "</td></tr><tr><td colspan='2'><span id='refuse' class='popupButton'>" + refuseLabel + "</span><span id='accept' class='popupButton'>" + acceptLabel + "</span></td></tr></table></td></tr>";   
+    parent.style.overflow = "hidden";  //hiddes the navigation bar in case content is greater than the screen, bug in case more than one is opened   
     parent.appendChild(table); 
     document.getElementById("accept").addEventListener("click", function() {           
         parent.removeChild(table);
+        parent.style.overflow = "visible";
         acceptCallback();  
     });   
     document.getElementById("refuse").addEventListener("click", function() {    
         parent.removeChild(table);
+        parent.style.overflow = "visible";
         refuseCallback();  
     });
+}
+
+function ShowMenu() {
+    document.getElementById("menu").style.display = "table";
+    document.getElementById("user").style.backgroundColor = "#333";
+}
+            
+function HideMenu() {
+    document.getElementById("menu").style.display = "none";
+    document.getElementById("user").style.backgroundColor = "#000";
 }

@@ -29,6 +29,7 @@ body {
     background-color: darkblue;
     line-height: 30px;
     text-align: center;
+    display: none;
 }
 
 header {
@@ -52,6 +53,11 @@ header {
     padding-left: 5px;
     padding-right: 5px;
     display: none;
+    background-color: #000;
+    box-sizing: border-box;
+    border-bottom: 1px solid #222;
+    min-width: 150px;
+    text-shadow: 0px 0px 2px #000;
 }
 
 #userImg {
@@ -76,6 +82,31 @@ header {
     position: relative;
     top: -4px;
 }
+
+#section {
+    position: relative;    
+}
+
+#menu {
+    position: absolute;
+    top: -5px;
+    right: 0;
+    background-color: #333;
+    min-width: 150px;   
+    display: none;
+    border-collapse: collapse;
+    text-shadow: 0px 0px 2px #000;
+}
+
+#menu td {
+    box-sizing: border-box;
+    border-bottom: 1px solid #222;
+    text-align: right;
+    height: 60px;
+    padding: 0 10px 0 20px;
+    font-size: 20px;
+}
+
 
 /*  Devices Styles  */
 

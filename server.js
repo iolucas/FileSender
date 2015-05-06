@@ -25,21 +25,20 @@ app.use(express.static("public"));
     
 //CREATE NEW SESSION AND RESPOND GET/ WITH THE SESSION CREATED
 app.get("/", function(req, res) {
-    res.sendFile(__dirname + "/public/session.html");
-    
-    
-    
-    /*var newSession = createSession();
+    var newSession = createSession();
     log("New session created: " + newSession);    
     //res.redirect("https://b.qeek.me/" + newSession);
-    res.redirect(newSession); */
+    res.redirect(newSession);
 });
 
 //CHECK IF THE REQUESTED GET/* PATH EXISTS, IF SO, RETURN INDEX, IF NOT, RETURN ERROR     
 app.get("/*", function(req, res) {  
     //CHECK REQUESTED GET/*
-    if(req.path == "/status")
+    
+    if(req.path == "/getSystemStatus")
         res.send("<html>Status:<br>Connections: " + Misc.LengthOf(connections) + "<br>Sessions: " + Misc.LengthOf(sessions));
+    else if(!sessions[req.path.substr(1)])   //if the session does not exists
+        res.send("Not Found");
     else if(req.path.indexOf(".") == -1) //verify if the request has no dot, meaning that is session request
         res.sendFile(__dirname + "/public/session.html");
     else    //if any dot is found, 
@@ -74,15 +73,7 @@ function readLines(input, func) {
   });
 }
 
-
-// start the server on the calculated port and host
-httpServer.listen(appEnv.port, function() {
-    console.log("server starting on " + appEnv.url)
-})
-
 //-----------------------------------------------
-
-
 
 var connections = [];
 
@@ -126,15 +117,20 @@ wsServer.on("connection", function(sock) {
         
         /*          Join Session        */
         sessions[sessionId].members[connId] = wSocket;
-            
-        if(sessions[sessionId].hostId == "") {
+        
+        //MUST GET THE IP ADDRESS AND PUT IT IN SOME ARRAY TO GET LOCAL DEVICES
+        
+        wSocket.emit("sessionJoined", sessionId);
+        
+        
+        /*if(sessions[sessionId].hostId == "") {
             sessions[sessionId].hostId = connId;
             wSocket.emit("sessionJoined", "", sessionId, connId);
         } else {
             var hostId = sessions[sessionId].hostId;
             wSocket.emit("sessionJoined", hostId, sessionId, connId);
             //got to have two separate emites due to in case of host it has to be empty and it is changed in the middle way
-        }
+        }*/
         
         wSocket.on("close", function() {
             
@@ -187,6 +183,13 @@ wsServer.on("connection", function(sock) {
         } catch (error) {}
     });    
 });
+
+
+
+// Everthing is set, start listening Connections
+httpServer.listen(appEnv.port, function() {
+    console.log("Server starting on " + appEnv.url)
+})
 
 
 
