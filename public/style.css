@@ -7,7 +7,9 @@ html, body {
 }
 
 body {
+    background-color: rgb(174,167,159);
     background-image: linear-gradient(135deg,rgb(174,167,159),#e8e8e8,rgb(174,167,159));
+/*    background-image: linear-gradient(135deg,#000 30%,#004000, #fff);*/
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -22,9 +24,17 @@ body {
     user-select: none;   
 }
 
+#message {
+    height: 30px;    
+    background-color: darkblue;
+    line-height: 30px;
+    text-align: center;
+}
+
 header {
     background-color: #000;
     height: 61px;
+    margin-bottom: 5px;
 }
 
 .logo {
@@ -35,13 +45,13 @@ header {
 
 /*  User Menu Style */
 
-.user {
+#user {
     height: 100%;
-    background-color: #222;
     float: right;
     text-align: right;
     padding-left: 5px;
     padding-right: 5px;
+    display: none;
 }
 
 #userImg {
@@ -67,20 +77,17 @@ header {
     top: -4px;
 }
 
-
-
-
 /*  Devices Styles  */
 
 .device {
-    margin: 10px 5px 0px 5px;
+    margin: 5px;
     width: calc(100% - 10px);
     text-shadow: 0px 0px 2px #000;
+    background-color: #555;
 }
 
 .mainDevice {
     height: 80px;    
-    background-color: #555;
     width: 100%;
     border-collapse: collapse;
 }
@@ -109,125 +116,90 @@ header {
 }
 
 .deviceName span {
-    font-size: 12px; 
-}
-
-.upload, .download {
-    height: 60px;    
-    width: 100%;
-    border-collapse: collapse;
-    background-repeat: no-repeat;
-    background-size: 30% 100%; 
-}
-
-.upload {
-    background-image: linear-gradient(#ffafff, #f0f);
-    background-color: #aaa;
-}
-
-.download {
-    background-image: linear-gradient(#004000, #0f0);
-    background-color: #777;
-}
-
-
-.upload td, .download td {
-    height: 50%;
-    padding-left: 5px;
     font-size: 12px;
 }
 
-.fileTitle {
+.transfer {               
+    width: 100%;
+    height: 60px;
+    padding: 0px 5px 0px 5px;
+    border-spacing: 0;
+    border-collapse: separate;
+    font-size: 12px;
+    display: none;
+}
+
+.transfer td {
     max-width: 1px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;       
 }
 
+.upBar, .downBar {
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+    background-color: #aaa;
+    text-align: center;   
+}
+
+.upBar {
+    background-image: linear-gradient(#ffafff, #f0f);       
+}
+
+.downBar {
+    background-image: linear-gradient(#004000, #0f0); 
+}
+
 .cancel {
-    background-color: rgba(128,0,0,0);    
-    text-align: center;
-    width: 1px;
-    height: 100%;
+    text-align: right; 
 }
-
-.cancelImg {
-    height: 40px;    
-    margin: 3px 14px 0px 3px;         
-}
-
-.oneMoreTry {
-        
-    width: 100%;
-    height: 60px;
-    background-color: #555;
-    border: 0px solid blue;
-    padding: 0px 5px 0px 5px;
-    border-spacing: 0;
-    border-collapse: separate;
-
-}
-
-.oneMoreTry td {
-    border: 0px solid blue;
-    box-sizing: border-box;
-    
-    font-size: 12px;
-}
-
-.test234 {
-        border-collapse: collapse;
-    background-repeat: no-repeat;
-    background-size: 30% 100%; 
-    background-image: linear-gradient(#004000, #0f0);
-    height: 10px;
-    background-color: #aaa;
-    text-align: center;
-}
-
-.file {
-    text-align: left;
-}
-
-.hold {
-   text-align: right; 
-    
-}
-
-.test235 {
-        border-collapse: collapse;
-    background-repeat: no-repeat;
-    background-size: 30% 100%; 
-    background-image: linear-gradient(#ffafff, #f0f);
-    height: 10px;
-    background-color: #aaa;
-    text-align: center;
-}
-
-
-
-
-
 
 
 /*  Popup Style */
 
-.popup {
+.screenDisabled {
     position: absolute;
+    top:0;
+    left: 0;
     height: 100%;
     width: 100%;
     background-color: rgba(0,0,0,.8);
     z-index: 10;
     text-align: center;
-    display: none;
 }
 
 .popupWindow {
-    height: calc(100% - 200px);
-    width: calc(100% - 50px);
+    height: 250px;
+    width: 300px;
     background-color: #fff;
-    display: inline-block;
-    margin: 100px 25px 100px 25px;
+    display: inline-table;
+    vertical-align: middle;
+    padding: 10px;
+    box-sizing: border-box;
+    font-size: 16px;
+    color: #000;
+}
+
+input[type=checkbox] {
+    margin: 5px 0 15px 0;
+}
+
+input[type=text] {
+    margin: 15px 0 15px 0;
+    font-size: 20px;
+}
+
+.popupButton {
+    margin: 0px 20px 0px 20px;
+    height: 20px;
+    padding: 10px;
+    background-color: #ddd;
+    font-size: 20px;
+    min-width: 50px;
+    width: 70px;
+    line-height: 20px;
+    display: inline-block;   
 }
 
 
