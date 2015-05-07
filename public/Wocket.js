@@ -7,15 +7,15 @@ try {
 function Wocket(wSocket) {   
     
     var self = this;    //holds its own ref
-    var events = [];    //events array to store callbacks
-    
-    this.ws = wSocket;  //get websocket reference
+    var events = [];    //events array to store callbacks     
     
     if(!wSocket) {    //if not specified, so its client side
         this.connect = function(serverAddr) {   //creates connect method           
             try {
                 wSocket = new WebSocket(serverAddr);    //creates new websocket with the address to connect to
-            
+                
+                self.ws = wSocket;  //get websocket reference
+                
                 //inits the websocket events only after the object has been created
                 wSocket.onopen = function() {   //sign the open event as connected
                     if(events["connected"])
@@ -34,6 +34,13 @@ function Wocket(wSocket) {
             }            
         };   
     } else {    //if it is specified it is server side
+        
+        self.ws = wSocket;  //get websocket reference
+        
+        self.getIpv4 = function () {    //get the connection ipv4
+            var ipCollection = self.ws.upgradeReq.connection.remoteAddress;
+            return ipCollection.substr(ipCollection.lastIndexOf(":") + 1);    
+        };
         
         //inits the websocket events
         wSocket.onerror = eventOnError; 
