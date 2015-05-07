@@ -5,8 +5,8 @@ var cfenv = require("cfenv"),   //get cloud foundry enviroment module
     http  = require("http"),    //get http module
     ws = require("ws"), //get the websocket module
     express = require("express"),   //get express module
-    Wocket = require("./Wocket"),  //Import MaestroSocket class from MaestroSocket.js
-    //IdManager = require("./IdManager"), //get IdManager module
+    Wocket = require("./public/Wocket"),  //Import MaestroSocket class from MaestroSocket.js
+    IdManager = require("./IdManager"), //get IdManager module
     Misc = require("./MiscFunctions"),  //Import MiscFunctions class from MiscFunctions.js 
 
 //INIT MODULES
@@ -18,7 +18,6 @@ var cfenv = require("cfenv"),   //get cloud foundry enviroment module
 
 
 //------------------------------------------------------------------------------------//
-fs = require("fs");
 
 //SERVE HTTP FILES IN PUBLIC FOLDERS
 app.use(express.static("public"));  
@@ -36,7 +35,8 @@ app.get("/*", function(req, res) {
     //CHECK REQUESTED GET/*
     
     if(req.path == "/getSystemStatus")
-        res.send("<html>Status:<br>Connections: " + Misc.LengthOf(connections) + "<br>Sessions: " + Misc.LengthOf(sessions));
+        //res.send("<html>Status:<br>Connections: " + Misc.LengthOf(connections) + "<br>Sessions: " + Misc.LengthOf(sessions));
+        res.send("<html>Status:<br>Sessions: " + Misc.LengthOf(sessions));
     else if(!sessions[req.path.substr(1)])   //if the session does not exists
         res.send("Not Found");
     else if(req.path.indexOf(".") == -1) //verify if the request has no dot, meaning that is session request
@@ -45,44 +45,11 @@ app.get("/*", function(req, res) {
         res.end();  //finish the response
 });
 
-var wordList = [];
-var input = fs.createReadStream("words.txt");
-
-readLines(input, function (data) {
-    wordList.push(data);
-});
-
-function readLines(input, func) {
-  var remaining = '';
-
-  input.on('data', function(data) {
-    remaining += data;
-    var index = remaining.indexOf('\n');
-    while (index > -1) {
-      var line = remaining.substring(0, index);
-      remaining = remaining.substring(index + 1);
-      func(line);
-      index = remaining.indexOf('\n');
-    }
-  });
-
-  input.on('end', function() {
-    if (remaining.length > 0) {
-      func(remaining);
-    }
-  });
-}
-
 //-----------------------------------------------
-
-var connections = [];
 
 var sessions = [];
 
 wsServer.on("connection", function(sock) {
-        
-    var connId = "";
-    var username = "";
     
     log("New connection.");
     
@@ -92,99 +59,90 @@ wsServer.on("connection", function(sock) {
         log("Websocket error.");    
     });
     
-    wSocket.on("joinSession", function(sessionId, user) {
-    //atribuite id only when joining sessions
+    wSocket.on("joinSession", function(sessionAddr, username) {
     //generate timeout in case information is not send by connected client
                 
-        if(!sessions[sessionId]) {
-            wSocket.emit("joinError", sessionId);
+        var connId;  //var to store this connection id
+        var connIpv4 = wSocket.getIpv4();   //get connection ip
+        
+        if(!sessions[sessionAddr]) {
+            wSocket.emit("joinError", sessionAddr);
             log("Session join error");
             wSocket.close();
             return;   
         }
         
-        //get session ref
-        connSession = sessionId;
-        username = user;
-        /*  Create new connection ID    */
+        //If IPV4 Group is not present, create it
+        if(!sessions[connIpv4]) {
+            log("Creating new IPV4 Group: " + connIpv4);
+            sessions[connIpv4] = [];
+        }
+        
+        
+        //CREATE NEW CONNECTION ID
+        //Keeps generating 20 chars id until a not used is found
+        //Try to find away to lock sessions array to ensure not equal id is got
         do {
-            connId = Misc.GetAlphaNumId(10);    
-        } while(connections[connId]);
-          
-        connections[connId] = wSocket;
+            connId = Misc.GetAlphaNumId(20);    
+        } while(sessions[connIpv4][connId] || sessions[sessionAddr][connId]);
+                 
+        sessions[sessionAddr][connId] = wSocket;    //Join session
+        
+        sessions[connIpv4][connId] = wSocket; //Join ipv4 group
+
         log("New client ID: " + username + " " + connId);
-        /*  -------------------------   */
         
-        /*          Join Session        */
-        sessions[sessionId].members[connId] = wSocket;
+        //Set connection sucessfull events....
         
-        //MUST GET THE IP ADDRESS AND PUT IT IN SOME ARRAY TO GET LOCAL DEVICES
-        
-        wSocket.emit("sessionJoined", sessionId);
-        
-        
-        /*if(sessions[sessionId].hostId == "") {
-            sessions[sessionId].hostId = connId;
-            wSocket.emit("sessionJoined", "", sessionId, connId);
-        } else {
-            var hostId = sessions[sessionId].hostId;
-            wSocket.emit("sessionJoined", hostId, sessionId, connId);
-            //got to have two separate emites due to in case of host it has to be empty and it is changed in the middle way
-        }*/
-        
-        wSocket.on("close", function() {
+        //On peer data...
+        wSocket.on("peerData", function(destId, data) {        
+            //maybe implement query id in the future to identify messages
             
-            if(sessions[sessionId].members[connId])
-                delete sessions[sessionId].members[connId];
-
-            if(connections[connId])
-                delete connections[connId];
-            
-            log("Client " + connId + " disconnected.");
-            log("Session members: " + Misc.LengthOf(sessions[sessionId].members));
-            if(Misc.LengthOf(sessions[sessionId].members) == 0) {
-                log("Deleting empty session.");
-                delete sessions[sessionId];          
-            }
-            else if(sessions[sessionId].hostId == connId) {  //so you were the host, need to get a new
-            
-                log("Host has disconnected. Electing new host...");    
-                var newHostId = electHost(sessionId);  
-                log("ID: " + newHostId + " is now the new host.");
-            
-                log("Informing session members...");
-                log(Misc.LengthOf(sessions[sessionId].members));
-                for(memberId in sessions[sessionId].members) {
-                    if(sessions[sessionId].hostId != memberId)
-                        sessions[sessionId].members[memberId].emit("newHost", newHostId);
-                    else
-                        sessions[sessionId].members[memberId].emit("newHost", "");
-                }
-            
-                log("All sessions has been informed.");
-
-                log("Informing host socket is closed");
-                sessions[sessionId].members[sessions[sessionId].hostId].emit("peerClosure", connId);
-            } else {
-                log("Informing peers socket is closed");
-                sessions[sessionId].members[sessions[sessionId].hostId].emit("peerClosure", connId);
-            }
-        });
-    });
-    
-    wSocket.on("peerData", function(destId, sessionId, data) {        
-
-    //maybe implement query id in the future
-        try {
-            if(sessions[sessionId].members[destId])
-                sessions[sessionId].members[destId].emit("peerData", connId, data);
-            else
+            if(sessions[connIpv4][destId]) //check if the destination id belongs to ipgroup
+                sessions[connIpv4][destId].emit("peerData", connId, data);               
+            else if(sessions[sessionAddr][destId])  //if not, check if the destination id belong to session address
+                sessions[sessionAddr][destId].emit("peerData", connId, data);   
+            else    //if not, send the sender an error message due to destination not found
                 wSocket.emit("peerDataError", destId, data);
-        } catch (error) {}
-    });    
+        });  
+          
+        //On connection close...
+        wSocket.on("close", function() {          
+            if(sessions[connIpv4][connId])    //Check if this connection belong to the ipv4 group
+                delete sessions[connIpv4][connId];  //if so, delete it            
+           if(sessions[sessionAddr][connId])    //Check if this connection belong to the session address
+                delete sessions[sessionAddr][connId];  //if so, delete it        
+            log("Client " + connId + " disconnected.");
+            log("Session Address members: " + Misc.LengthOf(sessions[sessionAddr]));
+            log("IPV4 Group members: " + Misc.LengthOf(sessions[connIpv4]));
+            
+            //Check if the session is empty, if so, delete it, if not inform members this connection is closed
+            if(Misc.LengthOf(sessions[sessionAddr]) == 0) {
+                log("Deleting empty session.");
+                delete sessions[sessionAddr];          
+            } else {
+                log("Informing session this connection is closed...");
+                for(var id in sessions[sessionAddr])
+                    sessions[sessionAddr][id].emit("peerClosure", connId);
+                log("All sessions has been informed.");
+            }
+            
+            //Check if the ipv4 group is empty, if so, delete it, if not inform members this connection is closed
+            if(Misc.LengthOf(sessions[connIpv4]) == 0) {
+                log("Deleting empty ipv4 group.");
+                delete sessions[connIpv4];          
+            } else {
+                log("Informing session this connection is closed...");
+                for(var id in sessions[connIpv4])
+                    sessions[connIpv4][id].emit("peerClosure", connId);
+                log("All sessions has been informed.");
+            }  
+        });            
+        
+        //Everything is set, inform the connection it has joined
+        wSocket.emit("sessionJoined", sessionAddr);   //                   
+    });
 });
-
-
 
 // Everthing is set, start listening Connections
 httpServer.listen(appEnv.port, function() {
@@ -192,30 +150,16 @@ httpServer.listen(appEnv.port, function() {
 })
 
 
-
 function createSession() {
     
     do {
-        var newSessionId = getWordId();       
+        var newSessionId = IdManager.getWordId();       
     } while(sessions[newSessionId]);
              
-    sessions[newSessionId] = new Object();
-    sessions[newSessionId].hostId= "";
-    sessions[newSessionId].members = [];
+    sessions[newSessionId] = [];
+    //sessions[newSessionId].members = [];
     
     return newSessionId;
-}
-
-function electHost(sessionId) {
-    //for now, take the first client connected
-    //in the future, choose based on statistic like better performance or activity
-    
-    for(memberId in sessions[sessionId].members){
-        log("the first member is :" + memberId);
-        sessions[sessionId].hostId = memberId;
-        log("THE NEW HOST ISSS" + sessions[sessionId].hostId);
-        return memberId;
-    }
 }
 
 function getDataStr(dataObj) {
@@ -225,30 +169,6 @@ function getDataStr(dataObj) {
 function getDataObj(dataStr) {
     return JSON.parse(dataStr);
 }
-
-function getWordId()
-{
-    if(wordList.length == 0)
-        return null;
-    
-    var numberFirst = false;
-    
-    if(Math.random() > 0.5)
-        numberFirst = true;
-    
-    var numberId = Misc.GetNumId(3);
-    
-    var wIndex = (Math.random() * wordList.length).toFixed(0);  //got to fix 0 decimal places to use an index
-    var wordId = wordList[wIndex];  
-    
-    wordId = wordId.substr(0,wordId.length-1);
-    
-    if(numberFirst)
-        return numberId+wordId;
-    else
-        return wordId+numberId; 
-}
-
     
 function log(string){   //wrap for log info into the console
     cTime = new Date();
