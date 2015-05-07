@@ -13,6 +13,7 @@ GENERAL TODO:
 
 SERVER TODO:
 
+-   Must find away to implement lock in generating sessions to ensure not equal id is generated due to time issues (verify mongodb relation with this)
 -   Change mode to elect new host based on statistics
 -   If server crashes, for now, only clear session members
 -   Set timeout to answer error if took too long to get and address
