@@ -25,7 +25,7 @@ body {
 }
 
 #message {
-    height: 30px;    
+    line-height: 30px;    
     background-color: darkblue;
     line-height: 30px;
     text-align: center;
