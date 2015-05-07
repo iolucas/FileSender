@@ -33,8 +33,11 @@ app.get("/", function(req, res) {
 //CHECK IF THE REQUESTED GET/* PATH EXISTS, IF SO, RETURN INDEX, IF NOT, RETURN ERROR     
 app.get("/*", function(req, res) {  
     //CHECK REQUESTED GET/*
-    
-    if(req.path == "/getSystemStatus")
+    if(req.path == "/about")
+        res.sendFile(__dirname + "/public/about.html");
+    else if(req.path == "/terms")
+        res.sendFile(__dirname + "/public/terms.html");   
+    else if(req.path == "/getSystemStatus")
         //res.send("<html>Status:<br>Connections: " + Misc.LengthOf(connections) + "<br>Sessions: " + Misc.LengthOf(sessions));
         res.send("<html>Status:<br>Sessions: " + Misc.LengthOf(sessions));
     else if(!sessions[req.path.substr(1)])   //if the session does not exists
@@ -59,11 +62,15 @@ wsServer.on("connection", function(sock) {
         log("Websocket error.");    
     });
     
-    wSocket.on("joinSession", function(sessionAddr, username) {
+    wSocket.on("joinSession", function(sessionAddr, username, deviceType) {
     //generate timeout in case information is not send by connected client
                 
         var connId;  //var to store this connection id
         var connIpv4 = wSocket.getIpv4();   //get connection ip
+        
+        //sign the Wocket instance some data
+        wSocket.username = username;
+        wSocket.deviceType = deviceType;
         
         if(!sessions[sessionAddr]) {
             wSocket.emit("joinError", sessionAddr);
@@ -78,7 +85,6 @@ wsServer.on("connection", function(sock) {
             sessions[connIpv4] = [];
         }
         
-        
         //CREATE NEW CONNECTION ID
         //Keeps generating 20 chars id until a not used is found
         //Try to find away to lock sessions array to ensure not equal id is got
@@ -89,6 +95,8 @@ wsServer.on("connection", function(sock) {
         sessions[sessionAddr][connId] = wSocket;    //Join session
         
         sessions[connIpv4][connId] = wSocket; //Join ipv4 group
+        
+        wSocket.connId = connId;    //gets the connection id
 
         log("New client ID: " + username + " " + connId);
         
@@ -117,34 +125,56 @@ wsServer.on("connection", function(sock) {
             log("IPV4 Group members: " + Misc.LengthOf(sessions[connIpv4]));
             
             //Check if the session is empty, if so, delete it, if not inform members this connection is closed
-            if(Misc.LengthOf(sessions[sessionAddr]) == 0) {
+            if(Misc.LengthOf(sessions[sessionAddr]) <= 0) {
                 log("Deleting empty session.");
                 delete sessions[sessionAddr];          
             } else {
                 log("Informing session this connection is closed...");
                 for(var id in sessions[sessionAddr])
                     sessions[sessionAddr][id].emit("peerClosure", connId);
-                log("All sessions has been informed.");
+                log("All members of the session have been informed.");
             }
             
             //Check if the ipv4 group is empty, if so, delete it, if not inform members this connection is closed
-            if(Misc.LengthOf(sessions[connIpv4]) == 0) {
+            if(Misc.LengthOf(sessions[connIpv4]) <= 0) {
                 log("Deleting empty ipv4 group.");
                 delete sessions[connIpv4];          
             } else {
-                log("Informing session this connection is closed...");
+                log("Informing ipv4 group this connection is closed...");
                 for(var id in sessions[connIpv4])
                     sessions[connIpv4][id].emit("peerClosure", connId);
-                log("All sessions has been informed.");
+                log("All members of the ipv4 group have been informed.");
             }  
         });            
         
         //Everything is set, inform the connection it has joined
-        wSocket.emit("sessionJoined", sessionAddr);   //                   
+        wSocket.emit("sessionJoined", sessionAddr);
+        
+        //Informing session and ipv4 group members this device connection and inform this connection all the already connected devices
+        
+        //Iterate thru the session address...
+        for(id in sessions[sessionAddr]) {
+            if(id == connId)    //ensure to not send informationto connection itself
+                continue;          
+            //inform current id this device connection
+            sessions[sessionAddr][id].emit("NewDevice", connId, username, "session", deviceType);   
+            //inform this connection, the current device
+            sessions[sessionAddr][connId].emit("NewDevice", id, sessions[sessionAddr][id].username, "session", sessions[sessionAddr][id].deviceType);
+        }
+        
+        //Iterate thru the ipv4 group...
+        for(id in sessions[connIpv4]) {
+            if(id == connId)    //ensure to not send informationto connection itself
+                continue;          
+            //inform current id this device connection
+            sessions[connIpv4][id].emit("NewDevice", connId, username, "local", deviceType);   
+            //inform this connection, the current device
+            sessions[connIpv4][connId].emit("NewDevice", id, sessions[connIpv4][id].username, "local", sessions[connIpv4][id].deviceType);
+        }        
     });
 });
 
-// Everthing is set, start listening Connections
+// Everything is set, start listening Connections
 httpServer.listen(appEnv.port, function() {
     console.log("Server starting on " + appEnv.url)
 })
@@ -157,7 +187,6 @@ function createSession() {
     } while(sessions[newSessionId]);
              
     sessions[newSessionId] = [];
-    //sessions[newSessionId].members = [];
     
     return newSessionId;
 }
