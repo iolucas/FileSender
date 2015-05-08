@@ -24,9 +24,11 @@ function ShowMessage(message, backColor) {
     document.getElementById("message").style.display = "block";    
 }
 
-function ShowTempMessage(message, backColor, time) {
-    ShowMessage(message, backColor);
-    setTimeout(function() {
+var tOutRef;
+function ShowTempMessage(message, time, backColor) {
+    if(tOutRef) clearTimeout(tOutRef);  //clear current timeout 
+    ShowMessage(message, backColor);    //show message
+    tOutRef = setTimeout(function() {   //set timeout to hide message
         HideMessage();    
     }, time);
 }
@@ -65,6 +67,13 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     devNameTd.setAttribute("class", "deviceName");
     devNameTd.innerHTML = deviceName + "<br><span>" + deviceOrigin + "</span>";
     
+    var fileInput = document.createElement("input");
+    fileInput.setAttribute("type", "file");
+    fileInput.addEventListener("change", function(event) {
+        var file = event.target.files; // get the files selected in the input file
+        uploadCallback(self, file[0]);
+    });
+    
     var upIcoTd = document.createElement("td");
     upIcoTd.setAttribute("class", "mainImgTd");
     
@@ -72,7 +81,8 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     upIco.src = "img/up.png";
     upIco.setAttribute("class", "uploadImg");
     upIco.addEventListener("click", function() {
-        uploadCallback(self);           
+        //uploadCallback(self);
+        fileInput.click();
     });
     
     //  Download Layout //
@@ -95,8 +105,11 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     var drow1 = document.createElement("tr");
     
     var downFileName = document.createElement("td");
-    downFileName.setAttribute("colspan", "2");
-    downFileName.innerHTML = "Recebendo:";
+    downFileName.setAttribute("class", "fileFirstCol");
+    downFileName.innerHTML = "";
+    
+    var downState = document.createElement("td");
+    downState.setAttribute("class", "fileLastCol");
     
     var drow2 = document.createElement("tr");
     
@@ -108,10 +121,10 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     var drow3 = document.createElement("tr");
     
     var downLeft = document.createElement("td");
-    downLeft.innerHTML = "";
+    downLeft.setAttribute("class", "fileFirstCol");
     
     var downCancel = document.createElement("td");
-    downCancel.setAttribute("class", "cancel");
+    downCancel.setAttribute("class", "fileLastCol");
     downCancel.innerHTML = "Pressione para Cancelar";
     
     //  Upload Layout //
@@ -134,8 +147,10 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     var urow1 = document.createElement("tr");
     
     var upFileName = document.createElement("td");
-    upFileName.setAttribute("colspan", "2");
-    upFileName.innerHTML = "Enviando:";
+    upFileName.setAttribute("class", "fileFirstCol");
+    
+    var upState = document.createElement("td");
+    upState.setAttribute("class", "fileLastCol");
     
     var urow2 = document.createElement("tr");
     
@@ -147,10 +162,10 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     var urow3 = document.createElement("tr");
     
     var upLeft = document.createElement("td");
-    upLeft.innerHTML = "";
+    upLeft.setAttribute("class", "fileFirstCol");
     
     var upCancel = document.createElement("td");
-    upCancel.setAttribute("class", "cancel");
+    upCancel.setAttribute("class", "fileLastCol");
     upCancel.innerHTML = "Pressione para Cancelar";  
     
     //  Append Everything   //
@@ -175,6 +190,7 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     download.appendChild(drow3);
     
     drow1.appendChild(downFileName);
+    drow1.appendChild(downState);
     drow2.appendChild(downBar);
     drow3.appendChild(downLeft);
     drow3.appendChild(downCancel);
@@ -186,6 +202,7 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     upload.appendChild(urow3);
     
     urow1.appendChild(upFileName);
+    urow1.appendChild(upState);
     urow2.appendChild(upBar);
     urow3.appendChild(upLeft);
     urow3.appendChild(upCancel);
@@ -202,19 +219,20 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     };
     
     this.setDownloadName = function(name) {
-        downFileName.innerHTML = "Recebendo: " + name;        
+        downFileName.innerHTML = name;        
     };    
     
-    this.setDownloadProgress = function(left, total) {       
-        var percentage = left * 100 / total;        
+    this.setDownloadProgress = function(curr, total) {       
+        var percentage = curr * 100 / total;        
         if(percentage < 0) percentage = 0;
         else if(percentage > 100) percentage = 100;      
-        downBar.style.backgroundSize = percentage + "% 100%";
-        if(percentage == 100)
-            downBar.innerHTML = "Download Completo";
-        else             
-            downBar.innerHTML = percentage.toFixed(1) + "%";       
-        downLeft.innerHTML = getSizeWord(left) + " / " + getSizeWord(total);
+        downBar.style.backgroundSize = percentage.toFixed(1) + "% 100%";           
+        downBar.innerHTML = percentage.toFixed(1) + "%";       
+        downLeft.innerHTML = getSizeWord(curr) + " / " + getSizeWord(total);
+    };
+    
+    this.setDownloadState = function(state) {
+        downState.innerHTML = state;    
     };
     
     this.showUpload = function() {
@@ -226,19 +244,20 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     };
     
     this.setUploadName = function(name) {
-        upFileName.innerHTML = "Enviando: " + name;        
+        upFileName.innerHTML = name;        
     };    
     
-    this.setUploadProgress = function(left, total) {       
-        var percentage = left * 100 / total;        
+    this.setUploadProgress = function(curr, total) {       
+        var percentage = curr * 100 / total;        
         if(percentage < 0) percentage = 0;
         else if(percentage > 100) percentage = 100;      
-        upBar.style.backgroundSize = percentage + "% 100%";
-        if(percentage == 100)
-            upBar.innerHTML = "Transferência Completa";
-        else             
-            upBar.innerHTML = percentage.toFixed(1) + "%";       
-        upLeft.innerHTML = getSizeWord(left) + " / " + getSizeWord(total);
+        upBar.style.backgroundSize = percentage.toFixed(1) + "% 100%";       
+        upBar.innerHTML = percentage.toFixed(1) + "%";       
+        upLeft.innerHTML = getSizeWord(curr) + " / " + getSizeWord(total);
+    };
+    
+    this.setUploadState = function(state) {
+        upState.innerHTML = state;    
     };
     
     this.DeleteDevice = function() {
