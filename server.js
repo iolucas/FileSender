@@ -25,6 +25,13 @@ app.use(express.static("public"));
 //CREATE NEW SESSION AND RESPOND GET/ WITH THE SESSION CREATED
 app.get("/", function(req, res) {
     var newSession = createSession();
+    //timeout in case no one connects to it until one minute, it will be cleared
+    setTimeout(function() { 
+        if(Misc.LengthOf(sessions[newSession]) <= 0) {
+            log("Deleting abandoned session.");
+            delete sessions[newSession]; 
+        } 
+    }, 60000);
     log("New session created: " + newSession);    
     //res.redirect("https://b.qeek.me/" + newSession);
     res.redirect(newSession);
@@ -37,9 +44,14 @@ app.get("/*", function(req, res) {
         res.sendFile(__dirname + "/public/about.html");
     else if(req.path == "/terms")
         res.sendFile(__dirname + "/public/terms.html");   
-    else if(req.path == "/getSystemStatus")
-        //res.send("<html>Status:<br>Connections: " + Misc.LengthOf(connections) + "<br>Sessions: " + Misc.LengthOf(sessions));
-        res.send("<html>Status:<br>Sessions: " + Misc.LengthOf(sessions));
+    else if(req.path == "/getSystemStatus") {
+        var statusWord = "<html>Status:<br>Sessions: " + Misc.LengthOf(sessions);
+
+        for(s in sessions)
+           statusWord += "<br><br>" + s; 
+        res.send(statusWord);
+        //res.send("<html>Status:<br>Sessions: " + Misc.LengthOf(sessions));
+    }
     else if(!sessions[req.path.substr(1)])   //if the session does not exists
         res.send("Not Found");
     else if(req.path.indexOf(".") == -1) //verify if the request has no dot, meaning that is session request
@@ -62,11 +74,13 @@ wsServer.on("connection", function(sock) {
         log("Websocket error.");    
     });
     
-    wSocket.on("joinSession", function(sessionAddr, username, deviceType) {
+    wSocket.on("joinSession", function(connIpv4, sessionAddr, username, deviceType) {
     //generate timeout in case information is not send by connected client
                 
         var connId;  //var to store this connection id
-        var connIpv4 = wSocket.getIpv4();   //get connection ip
+        
+        //This will not work due to internal proxies of bluemix. We are getting the ip explicitly from the client
+        //var connIpv4 = wSocket.getIpv4();   //get connection ip
         
         //sign the Wocket instance some data
         wSocket.username = username;
