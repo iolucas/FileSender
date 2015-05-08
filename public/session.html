@@ -44,6 +44,11 @@
         <script src="layout.js"></script>
         <script src="rtcconn.js"></script>
         <script src="misc.js"></script>
-        <script src="main.js"></script>
+        <script src="main.js"></script>      
+        <script>
+            var localIp;
+            function getIP(json) { localIp = json.ip; }
+        </script>
+        <script src="https://api.ipify.org?format=jsonp&callback=getIP"></script>
     </body>   
 </html>
