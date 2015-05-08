@@ -5,20 +5,10 @@ var sessionAddr = window.location.pathname.substr(1);    //Get sessionAddress fr
 var deviceType = isMobile() ? "mobile":"pc";    //Get deviceType    
 
 var wSocket; //Instance to have real time connection with the server
-    
-//var hostId = null;  //var to store the connection id of the session host. if undefined, this connection is the host
-//var myConnId = "";  //var to store your connection id
-//var newHostFlag = false;
-
-//var sendSession;    //var to store the current session address
 
 var rtcConnections = [];
 
 var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;  //verify whether the browser is firefox or other (chrome)
-
-//var msgOpened = false;  //flag signalizing whether the msg panel is opened or not
-//var msgIco = document.getElementById("msgIco"); //variable to store the msgIco element reference
-//var msgPanel = document.getElementById("msgPanel"); //variable to store the msgPanel element reference
            
 window.onload = function() {              
     //Check compatibility, if not, return and inform
@@ -53,6 +43,8 @@ function main() {
     //Set user info in the top of the screen
     SetLocalUser(username, sessionAddr, deviceType);
     
+    var devices = [];   //array to store devices
+    
     //gets websocket server url
     var wsUrl = document.URL.substring(7, document.URL.lastIndexOf("/"));
     
@@ -81,28 +73,77 @@ function main() {
             window.onbeforeunload = function() {
                 if(lengthOf(rtcConnections))
                 return "Hey, your session is still active!";       
-            }*/
-            
-            //MESSAGE BAR MUST ADJUST SIZE IN CASE MSG OVERFLOW THE POSSIBLE LENGTH
-            
-            //MUST SET ARRAY TO HANDLE DEVICES
-            
-            wSocket.on("NewDevice", function() {
-                
-            });
+            }*/           
 
-            ShowTempMessage("Conectado!", null, 2000);
-            //Getting same lan devices...
-            //Getting session devices...
+            ShowTempMessage("Conectado!", 3000);
         });
         
+        wSocket.on("NewDevice", function(dId, dName, dOrigin, dType) {
+            if(devices[dId])    //if this device exists, 
+                return; //do nothing and returns
+            
+            ShowTempMessage("Novo dispositivo!", 3000);
+            
+            //creates new object for the arrived device
+            devices[dId] = { devId: dId,    //puts the device id in the device object    
+                            devName: dName,
+                            devOrigin: devOrigin,
+                            devType: dType }
+            
+            //gets the device type message
+            var devOrigin;
+            if(dOrigin == "session") devOrigin = "Dispositivo de Sessão";
+            else if(dOrigin == "local") devOrigin = "Dispositivo Local";
+            else devOrigin = "ErrorOnGettingDevice";
+            
+            //creates a new device icon
+            var deviceIcon = new DeviceIcon(dName, devOrigin, dType, function(icon, file) {
+                icon.setUploadProgress(0, file.size);
+                icon.setUploadState("Conectando...");
+                icon.setUploadName(file.name);
+                icon.showUpload();
+            
+            }, function(){}, function(){});
+            devices[dId].Icon = deviceIcon; //put the icon ref in the new device object
+        });       
         
-        wSocket.emit("joinSession", sessionAddr, username);
+        wSocket.emit("joinSession", localIp, sessionAddr, username, deviceType);
     });
     
-
+    wSocket.on("peerDataError", function(destId, data) {
+        ShowTempMessage("Error: Peer data sent error =(", 5000, "#800");    
+    });
     
-
+    wSocket.on("peerClosure", function(closedId) {
+        if(!devices[closedId])  //checks if the id is not present on this instance
+            return; //if so, return and do nothing      
+            
+        //Close the correspondent icon
+        devices[closedId].Icon.DeleteDevice();
+        
+        ShowTempMessage(devices[closedId].devName + " has disconnected.", 3000, "#800");
+        
+        delete devices[closedId];   //deletes the device reference from the devices array
+        
+        /*if(hostId) //if got host id, means you not are the host, breaks
+            return;
+        
+        broadcastData(myConnId,80,closeId);
+                
+        if(rtcConnections[closeId]) //check if this peer got any connection with the host
+            rtcConnections[closeId].close();  //if so close it
+                
+        for(var fileId in RemoteFiles) {    //iterate thru all the disconnected client files
+            if(RemoteFiles[fileId].FileOwnerId == closeId) {   //check if the file belongs to the connection
+                DeleteRemoteFile(fileId);
+                        
+                if(currDownload && currDownload.id == fileId)
+                    currDownload.CancelDownload();
+                else
+                    DeleteIcon(fileId); //remove the file icon
+            }
+        }*/
+    });
     
 
     //CHANGE FOR DEVICE DATA
@@ -236,34 +277,7 @@ function main() {
         }    
     });
     
-    wSocket.on("peerDataError", function(destId, data) {
-        putScreenMsg("Error: Connection to the host has failed =(");
-        //alert("Error while sending data to " + destId);     
-    });
-    
 
-    //DEVICE CLOSING
-    wSocket.on("peerClosure", function(closeId) {
-        if(hostId) //if got host id, means you not are the host, breaks
-            return;
-        
-        broadcastData(myConnId,80,closeId);
-                
-        if(rtcConnections[closeId]) //check if this peer got any connection with the host
-            rtcConnections[closeId].close();  //if so close it
-                
-        for(var fileId in RemoteFiles) {    //iterate thru all the disconnected client files
-            if(RemoteFiles[fileId].FileOwnerId == closeId) {   //check if the file belongs to the connection
-                DeleteRemoteFile(fileId);
-                        
-                if(currDownload && currDownload.id == fileId)
-                    currDownload.CancelDownload();
-                else
-                    DeleteIcon(fileId); //remove the file icon
-            }
-        }
-    });
-    
     //All set, connect websocket
     ShowMessage("Conectando...");
     wSocket.connect("ws://" + wsUrl);
@@ -333,7 +347,7 @@ function requestConnection(remoteId) {
 
 function sendPeerData(destId, data) {
     //in the future, maybe use query id
-    wSocket.emit("peerData", destId, sendSession, data);
+    wSocket.emit("peerData", destId, data);
 }
 
 function SendRTCData(destId, dataCode, data) {
