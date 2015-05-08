@@ -6,7 +6,7 @@ var deviceType = isMobile() ? "mobile":"pc";    //Get deviceType
 
 var wSocket; //Instance to have real time connection with the server
 
-var rtcConnections = [];
+
 
 var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;  //verify whether the browser is firefox or other (chrome)
            
@@ -49,6 +49,11 @@ function main() {
     var wsUrl = document.URL.substring(7, document.URL.lastIndexOf("/"));
     
     wSocket = new Wocket(); //create new wocket instance
+    
+    var rtcManager = new SmartRTC(function(id, data) {
+        wSocket.emit("peerData", id, data);
+        
+    });
 
     wSocket.on("error", function() {
         alert("Socket Error");     
@@ -102,8 +107,11 @@ function main() {
                 icon.setUploadState("Conectando...");
                 icon.setUploadName(file.name);
                 icon.showUpload();
+                
+                log(rtcManager.NewConnection(dId));
             
             }, function(){}, function(){});
+            
             devices[dId].Icon = deviceIcon; //put the icon ref in the new device object
         });       
         
@@ -148,6 +156,9 @@ function main() {
 
     //CHANGE FOR DEVICE DATA
     wSocket.on("peerData", function(senderId, data) {
+        rtcManager.HandleData(senderId, data);
+        
+        /*
         switch(data.type) {
                 
             case "connRequest": 
@@ -274,7 +285,8 @@ function main() {
             default:
                 log("Data not handled. ID: " + senderId + " Data: " + data);
           
-        }    
+        } 
+        */
     });
     
 
@@ -321,7 +333,7 @@ function checkCompatibilityAndStart(sessionId, user) {
 }
 */
 
-function requestConnection(remoteId) {
+/*function requestConnection(remoteId) {
     var newRtcConn = new RTCDataChannel(null);
             
     rtcConnections[remoteId] = newRtcConn;
@@ -343,7 +355,7 @@ function requestConnection(remoteId) {
     newRtcConn.createOffer();
     
     return newRtcConn;
-}
+}*/
 
 function sendPeerData(destId, data) {
     //in the future, maybe use query id
@@ -601,53 +613,7 @@ function decode(dataString) {
         dataArray.push(dataString.charCodeAt(i));
     return dataArray;
 }
-
-
-
-function putPanelMsg(message, type){
-    
-    if(message==""){
-        document.getElementById("displayMsg").innerHTML += "\n";
-    } else if(!type){
-        document.getElementById("displayMsg").innerHTML += "\n" + getTimeStamp() + " " + message;
-    } else if(type == "keepLine") {
-            document.getElementById("displayMsg").innerHTML += getTimeStamp() + " " + message;      
-    }
-    
-    document.getElementById("displayMsg").scrollTop = document.getElementById("displayMsg").scrollHeight;
-    
-    if(!msgOpened)
-        flashMsgIco();
-    
-    /*else if(type=="warning") {
-        document.getElementById("displayMsg").innerHTML += "<span id=\"warning\">" + cTime.getHours() + ":" + cTime.getMinutes() + " " + message + "\n" + "</span>";  
-    } else if(type=="alert") {
-        document.getElementById("displayMsg").innerHTML += "<span id=\"alert\">" + cTime.getHours() + ":" + cTime.getMinutes() + " " + message + "\n" + "</span>";
-    }*/
-}
-    
-var flashId = null;
-
-function flashMsgIco() {  
-    if(flashId) //if flash id has already an id signed to it, returns
-        return;    
-    
-    flashId = setInterval(function() {
-        if(msgIco.style.opacity == "1")
-            msgIco.style.opacity = "0.5";   
-        else
-            msgIco.style.opacity = "1";
-    }, 500);    
-}
-
-function stopFlashMsgIco() {
-    if(!flashId)
-        return;
-    
-    clearInterval(flashId);    
-    flashId = null;       
-}
-    
+  
 
 function log(message) {
     console.log(message);

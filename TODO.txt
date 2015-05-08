@@ -54,10 +54,26 @@ Modelo "filial" qeek.me, para atingit global e sempre ter um server perto de voc
 -   Create system of a "online" stream that will act has a turn server to pass data on for non supported qeek.me devices
 -------
 
+----WEBRTC----
+-   Verify the RTC protocols each browser uses and check the needs of set protocols contraints like fire fox protocol is by default unreliable
+-   Test unreliable transfer to see if it matches with hack to accelerate
+-   Test unordered unreliable transfer
+-   Enhance RTC Conn Framework with the on and emit stuff
+-   Implement system in case of rtc connection falls or a timeout expire without data chunk, cancel the download
+-   Must verify enhancements in the rtc connections
+-   Create rtcconnections event as emit and on modes
+-   Check the add candidate callbacks needs (alert on fire fox)
+-   The same for setRemoteDesc and setLocalDesc
+--------------
+
+
+
+
+
 -   Change msg ico to qeek.me logo fullfiled
 -   generate timeout in case joinSession is not send by connected client, disconnect it
 -   Ensure https by verifiyng if the user typed https if not, redirect it to https
--   Integrate with android system to create a "Transfer with Qeek.me" menu
+-   Integrate with android system to create a "Transfer with Qeek.me" menu, (the way it is now, showing devices instead files, this must be done if some device is available, if not, it will show that there is no device available)
 -   Put welcome screen in qeek.me, create english and portuguese pages now!
 -   The first time someone enter on the page, an about page will prompt describing it, and a dont show me again box will appear as well
 -   Put and @sessionid on the top and when the user click on it, it will put the qeek.me/sessionid in the transfer area
@@ -68,16 +84,14 @@ Modelo "filial" qeek.me, para atingit global e sempre ter um server perto de voc
 -   Advertises while loading
 -   In the upper screen, will be shown the number of connected clients
 -   In the app, will have a similar address bar but with "qeek.me/" fixed and you will be able to write folder name only
--   Verify the RTC protocols each browser uses and check the needs of set protocols contraints like fire fox protocol is by default unreliable
+
 -   For a while test qeek.me with holding files into the memory
--   Test unreliable transfer to see if it matches with hack to accelerate
--   Test unordered unreliable transfer
+
 -   Use the host rtc connection to negotiate new connections
 -   Put message for the user do not close the page until the download is finish
 -   View about bootstrap, how heavy is it to get the website resposive; if so heavy, create your own way to do this
--   Enhance RTC Conn Framework with the on and emit stuff
--   Check the add candidate callbacks needs (alert on fire fox)
--   The same for setRemoteDesc and setLocalDesc
+
+
 -   Implement alert interface messages with timeout to show and disapear the alert in the upper screen
 -   Create menu for about stuff, change name etc
 -   Implement better screen for the desktop site
@@ -103,8 +117,8 @@ Modelo "filial" qeek.me, para atingit global e sempre ter um server perto de voc
 -   Check what is chrome app to implement this system
 -   Implement smart mode to elect new host in case host disconnect or have a bad perfomance
 -   Must implement system to local files get download requests list to be accepted to cancel if needed and get statistics
--   Implement system in case of rtc connection falls or a timeout expire without data chunk, cancel the download
--   Must verify enhancements in the rtc connections
+
+
 -   Implement system to calculate receiving data rate ,uploding and estimate download finalization
 -   Implement system to accept refuse or cancel download
 -   use all functions that return operation result values to detect errors
@@ -120,7 +134,7 @@ Modelo "filial" qeek.me, para atingit global e sempre ter um server perto de voc
 -   Must have a timeout system to send chunks request in case some of them didnt arrive
 -   Request will be made every 16 chunks received
 -   if timeout expire, will request all the left chunks from the previous 16 chunks packet request
--   Create rtcconnections event as emit and on modes
+
 -   Improve delete system, when one file is selected by holding, the other ones are selected with one click, and one click is enough to deselect any of them
 -   Take out the cursor pointer in mobile apps due to mouse pointer is not present
 -   Put advertise as icons in qeek.me

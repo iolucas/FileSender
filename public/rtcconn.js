@@ -1,5 +1,19 @@
 var RTCPeerConnection;  //Instance to hold native browser webrtc peer connection API
 
+/*----WEBRTC----
+-   Verify the RTC protocols each browser uses and check the needs of set protocols contraints like fire fox protocol is by default unreliable
+-   Test unreliable transfer to see if it matches with hack to accelerate
+-   Test unordered unreliable transfer
+-   Enhance RTC Conn Framework with the on and emit stuff
+-   Implement system in case of rtc connection falls or a timeout expire without data chunk, cancel the download
+-   Must verify enhancements in the rtc connections
+-   Create rtcconnections event as emit and on modes
+-   Check the add candidate callbacks needs (alert on fire fox)
+-   The same for setRemoteDesc and setLocalDesc
+--------------*/
+
+
+
 function isRTCReady() {
     // Chrome or Safari
     if (navigator.webkitGetUserMedia)
@@ -14,15 +28,17 @@ function isRTCReady() {
     return true;    
 }
 
+
+
+
 function RTCDataChannel(remoteDesc) {
    
     var self = this;
     
     // This is an optional configuration string associated with NAT traversal setup
-    var servers = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'}]};
-        
+    var servers = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'}]};       
 
-    // JavaScript variable associated with proper configuration of an RTCPeerConnection object: use DTLS/SRTP
+    // JavaScript variable associated with proper configuration of an RTCPeerConnection object: use DTLS/SRTP to criptograph data
     var pc_constraints = {'optional': [{'DtlsSrtpKeyAgreement': true}]};
     
     var peerConnection = new RTCPeerConnection(servers, pc_constraints);
