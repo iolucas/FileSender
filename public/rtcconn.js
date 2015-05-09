@@ -36,12 +36,12 @@ function RTCDataChannel(remoteDesc) {
     var self = this;
     
     // This is an optional configuration string associated with NAT traversal setup
-    var servers = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'}]};       
+    var pcConfiguration = {iceServers:[{url: 'stun:stun.l.google.com:19302'}]};       
 
     // JavaScript variable associated with proper configuration of an RTCPeerConnection object: use DTLS/SRTP to criptograph data
-    var pc_constraints = {'optional': [{'DtlsSrtpKeyAgreement': true}]};
+    var pc_constraints = {optional: [{DtlsSrtpKeyAgreement: true}]};
     
-    var peerConnection = new RTCPeerConnection(servers, pc_constraints);
+    var peerConnection = new RTCPeerConnection(pcConfiguration, pcConstraints);
     //log("Created local peer connection object, with Data Channel");  
     
     sdpReady = false;
