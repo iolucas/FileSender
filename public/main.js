@@ -6,7 +6,7 @@ var deviceType = isMobile() ? "mobile":"pc";    //Get deviceType
 
 var wSocket; //Instance to have real time connection with the server
 
-
+var rtcConnections = [];
 
 var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;  //verify whether the browser is firefox or other (chrome)
            
@@ -52,8 +52,12 @@ function main() {
     
     var rtcManager = new SmartRTC(function(id, data) {
         wSocket.emit("peerData", id, data);
-        
     });
+    
+    rtcManager.OnConnection = function(id, dataChannel) {
+        log("CHANNEL OPENED");    
+        
+    };
 
     wSocket.on("error", function() {
         alert("Socket Error");     
@@ -108,9 +112,13 @@ function main() {
                 icon.setUploadName(file.name);
                 icon.showUpload();
                 
-                log(rtcManager.NewConnection(dId));
+                rtcManager.NewConnection(dId);
             
-            }, function(){}, function(){});
+            }, function(){}, function(){
+                
+            
+            
+            });
             
             devices[dId].Icon = deviceIcon; //put the icon ref in the new device object
         });       
@@ -156,137 +164,8 @@ function main() {
 
     //CHANGE FOR DEVICE DATA
     wSocket.on("peerData", function(senderId, data) {
-        rtcManager.HandleData(senderId, data);
-        
-        /*
-        switch(data.type) {
-                
-            case "connRequest": 
-                
-                if(rtcConnections[senderId]) {
-                    //Got to verify whether this connection is currently active instead of verify whether it exists only
-                    break;
-                }
-                
-                log(data.sdpOffer);
-                rtcConnections[senderId] = new RTCDataChannel(data.sdpOffer);
-                rtcConnections[senderId].onAnswerReady = function(sdpAnswer) {
-                    sendPeerData(senderId, {
-                        type: "connAccepted",
-                        sdpAnswer: hackSDP(sdpAnswer)
-                    });
-                };
-                
-                rtcConnections[senderId].onChannelOpen = function() {
-                    log("CHANNEL OPENED");
-                    if(senderId == hostId) {
-                        //putPanelMsg("Session joined. You are not the host.","keepLine");
-                        if(!newHostFlag) {
-                            putPanelMsg("Session joined.","keepLine");
-                            putPanelMsg("");
-                            stopFlashMsgIco();
-                            msgIco.style.opacity = "0.5";
-                        }
-                        else
-                            newHostFlag = false;
-                    focusPanel();
-                    clearScreen();
-                    //sendRTCData(hostId, 8, "");
-                    SendRTCData(hostId, 8);
-                    } else {
-                        //putPanelMsg("You got a new connection.");
-                    }
-                            
-                    rtcConnections[senderId].onChannelClose = function() {
-                        if(senderId == hostId) {
-                            electNewHost();
-                            //if the host disconnect, for a while block the page
-                            //log("The session host has disconnected, the page is now stoped");                      
-                        }
-                        delete rtcConnections[senderId];
-                        log(lengthOf(rtcConnections));
-                        log("RTC ID: " + senderId + " has disconnected.");
-                        //putPanelMsg("Remote connection closed.");
-                                
-
-                    };
-                    
-                    rtcConnections[senderId].onMessage = function(data) {
-                        handleData(senderId, data);       
-                    };
-                
-                };
-                                 
-                rtcConnections[senderId].onIceCandidate = function(candidate) {
-                    sendPeerData(senderId, {
-                        type: "iceCand",
-                        candidate: candidate
-                    });
-                };
-        
-                rtcConnections[senderId].createAnswer();
-                //rtcConnections[senderId].onChannelClose = function(){log("CHANNEL CLOSED");};
-                break;
-            
-              
-            case "iceCand":
-                log(data.candidate);
-                rtcConnections[senderId].addIceCandidate(data.candidate);
-                break;
-
-            case "connAccepted":
-                log(data.sdpAnswer);
-                rtcConnections[senderId].setRemoteDescription(data.sdpAnswer);
-                rtcConnections[senderId].onChannelOpen = function() {
-                    log("CHANNEL OPENED");
-                    
-                    if(senderId == hostId) {
-                    //putPanelMsg("Session joined. You are not the host.","keepLine");
-                        if(!newHostFlag) {
-                            putPanelMsg("Session joined.","keepLine");
-                            putPanelMsg("");
-                            stopFlashMsgIco();
-                            msgIco.style.opacity = "0.5";
-                        }
-                        else
-                            newHostFlag = false;
-                                
-                        focusPanel();
-                        clearScreen();
-                        //sendRTCData(hostId, 8, "");
-                        SendRTCData(hostId, 8);
-                    } else {
-                        //putPanelMsg("You got a new connection!");
-                    }
-                            
-                    rtcConnections[senderId].onChannelClose = function() {
-                        if(senderId == hostId){
-                            electNewHost();
-                            
-                            //if the host disconnect, for a while block the page
-                            //log("The session host has disconnected, the page is now stoped");
-
-                        }
-                        delete rtcConnections[senderId];
-                        log(lengthOf(rtcConnections));
-                        log("RTC ID: " + senderId + " has disconnected.");
-                        //putPanelMsg("Remote connection closed.");
-                                
-                    };
-                    
-                    rtcConnections[senderId].onMessage = function(data) {
-                        handleData(senderId, data);    
-                    };
-                
-                };
-                //rtcConnections[senderId].onChannelClose = function(){log("CHANNEL CLOSED");};
-                break;
-                
-            default:
-                log("Data not handled. ID: " + senderId + " Data: " + data);
-          
-        } 
-        */
+        log(data);
+        rtcManager.HandleData(senderId, data);    
     });
     
 
@@ -332,8 +211,8 @@ function checkCompatibilityAndStart(sessionId, user) {
     }
 }
 */
-
-/*function requestConnection(remoteId) {
+/*
+function requestConnection(remoteId) {
     var newRtcConn = new RTCDataChannel(null);
             
     rtcConnections[remoteId] = newRtcConn;
