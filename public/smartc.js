@@ -7,6 +7,7 @@
 -   check the api events that should be implemented here
 -   maybe put a gambiarra that in case some of the browser are chrome, always call is originated from it
 -   server may generate a temp key to both connections to them recognize each other thru the identity provider
+-   opera browser acts exactly like chrome
 --------------*/
 
 function isRTCReady() {
@@ -195,7 +196,26 @@ function DataChannel(peerConnection, dataChannel) {
     }
     
     dataChannel.onmessage = function (message) {
-        var dataObj = getDataObj(message.data);  //get the data obj from the data message received    
+        //We can't detect msg type due to it comes like general object, only strings comes like "strings"
+        //Firefox only see blobs and strings and send blobs
+        //Chrome only see ArrayBuffer and strings and can't send blobs
+        //Opera acts like chrome
+        
+        //check if this is a check an ArrayBuffer and its event is signed (Chrome and Opera)
+        if(message.data.byteLength && events["ArrayBuffer"]) {    
+            for(cbIndex in events["ArrayBuffer"])   //for each callback in the ArrayBuffer event
+                events["ArrayBuffer"][cbIndex].apply(this, message.data); //fire with the arrayBuffer data and its scope as "this" value
+            return; //do nothing else and return
+        }   //if not, check if this is an object, means that is a Blob for (Firefox) and its event is signed
+        else if(typeof message.data == "object" && events["Blob"]) { 
+            for(cbIndex in events["Blob"])   //for each callback in the ArrayBuffer event
+                events["Blob"][cbIndex].apply(this, message.data); //fire with the arrayBuffer data and its scope as "this" value
+            return; //do nothing else and return
+        }
+        
+        //if it is not of the above, treat them here
+        
+        var dataObj = getDataObj(message.data);  //get the data obj from the data message received
         
         if(!dataObj.event || dataObj.event == "close" || dataObj.event == "connected" || dataObj.event == "error" || !events[dataObj.event])    
             //verifies whether the dataObj.event is not present, if any of them are protected  and if there is not callback sign with that value
@@ -223,16 +243,25 @@ function DataChannel(peerConnection, dataChannel) {
     this.emit = function(event) {
         try {    
             //this is needed due to send while not connected do not throw exceptions
-            if(dataChannel.readyState != 1) //check if the socket is opened
+            if(dataChannel.readyState != "open") //check if the socket is opened
                 throw "emitFailedDataChannelNotOpened";  //if not, throw an error socket not open       
             var args = [].slice.call(arguments) // slice without parameters copies all
             var dataObj = { event: args.shift(), args: args };  //create the data object with the data passed           
             dataChannel.send(getDataStr(dataObj));    //send the data string generated from the the dataobj
-        }
-        catch(error) {
+        } catch(error) {
             throwError(error);  //throw error methods  
         }      
-    }; 
+    };
+    
+    this.sendRaw = function(rawData) {
+        try {
+            if(dataChannel.readyState != "open") //check if the socket is opened
+                throw "sendRawFailedDataChannelNotOpened";  //if not, throw an error socket not open
+            dataChannel.send(rawData);    //send the data string generated from the the dataobj
+        } catch(error) {
+            throwError(error);  //throw error methods  
+        } 
+    };
     
     this.getReadyState = function() {      
         return dataChannel.readyState;   //return the current state 
