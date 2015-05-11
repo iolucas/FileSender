@@ -69,7 +69,7 @@ Modelo "filial" qeek.me, para atingit global e sempre ter um server perto de voc
 
 
 
-
+-   Implement each device queue of file to be sent
 -   Change msg ico to qeek.me logo fullfiled
 -   generate timeout in case joinSession is not send by connected client, disconnect it
 -   Ensure https by verifiyng if the user typed https if not, redirect it to https
