@@ -135,7 +135,7 @@ function SmartRTC(sendDataCallback) {
                 //console.log("Remote descriptor accepted.");             
                 peerConnection.createAnswer(function(sdpAnswer) { 
                     peerConnection.setLocalDescription(sdpAnswer, function() {
-                        sendPeerData(senderId, { answer: sdpAnswer });
+                        sendDataCallback(senderId, { answer: sdpAnswer });
                         //console.log("Local peer sucessfully created.");
                     }, onSignalingError);
                 }, onSignalingError);
@@ -189,7 +189,7 @@ function DataChannel(peerConnection, dataChannel) {
        throwError(error);  //throw error methods  
     };
     
-    dataChannel.onclose = function () {
+    dataChannel.onclose = function () {        
         if(events["close"])
             for(cbIndex in events["close"])   //for each callback in the event array,
                 events["close"][cbIndex].call(this); //fire with the args and its scope as "this" value    
@@ -290,6 +290,18 @@ function DataChannel(peerConnection, dataChannel) {
     function getDataObj(dataStr) {
         return JSON.parse(dataStr);
     }
+}
+
+
+function hackSDP(sdp) {
+/*    var split = sdp.split("b=AS:30");
+    if(split.length > 1)
+        var newSDP = split[0] + "b=AS:1638400" + split[1];
+    else
+        newSDP = sdp;
+        return newSDP;*/
+    
+    return sdp;
 }
 
 
