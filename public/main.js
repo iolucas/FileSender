@@ -1,14 +1,19 @@
 "use strict"; //ensure exception rise in case of bad pratices use
 
-var username = "";  //var to store instance username
-var sessionAddr = window.location.pathname.substr(1);    //Get sessionAddress from the address bar 
-var deviceType = isMobile() ? "mobile":"pc";    //Get deviceType    
+var username = "",  //var to store instance username
+    sessionAddr = window.location.pathname.substr(1),   //Get sessionAddress from the address bar 
+    deviceType = isMobile() ? "mobile":"pc",    //Get deviceType    
 
-var wSocket; //Instance to have real time connection with the server
+    rtcManager,
+    
+    wSocket, //Instance to have real time connection with the server
 
-var rtcConnections = [];
+    isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1,  //verify whether the browser is firefox or other (chrome)
 
-var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;  //verify whether the browser is firefox or other (chrome)
+    devices = [],   //array to store devices
+
+    dcOpenCallback = []; //datachannel open callback queue to be executed
+
            
 window.onload = function() {              
     //Check compatibility, if not, return and inform
@@ -40,24 +45,20 @@ function setUserAndStart() {
 //--------------  MAIN FUNCTION TO BE EXECUTED TO START EVERYTHING  --------------//
 
 function main() {
+    
     //Set user info in the top of the screen
     SetLocalUser(username, sessionAddr, deviceType);
-    
-    var devices = [];   //array to store devices
     
     //gets websocket server url
     var wsUrl = document.URL.substring(7, document.URL.lastIndexOf("/"));
     
     wSocket = new Wocket(); //create new wocket instance
     
-    var rtcManager = new SmartRTC(function(id, data) {
-        wSocket.emit("peerData", id, data);
+    rtcManager = new SmartRTC(function(id, data) {
+        wSocket.emit("peerData", id, data); //callback to be use to send signaling data
     });
     
-    rtcManager.OnConnection = function(id, dataChannel) {
-        log("CHANNEL OPENED");    
-        
-    };
+    rtcManager.OnConnection = OnDataChannelConnection;  //callback to be used when a dataChannel is stabilished
 
     wSocket.on("error", function() {
         alert("Socket Error");     
@@ -93,60 +94,29 @@ function main() {
             
             ShowTempMessage("Novo dispositivo!", 3000);
             
-            //creates new object for the arrived device
-            devices[dId] = { devId: dId,    //puts the device id in the device object    
-                            devName: dName,
-                            devOrigin: devOrigin,
-                            devType: dType }
-            
-            //gets the device type message
-            var devOrigin;
-            if(dOrigin == "session") devOrigin = "Dispositivo de Sessão";
-            else if(dOrigin == "local") devOrigin = "Dispositivo Local";
-            else devOrigin = "ErrorOnGettingDevice";
-            
-            //creates a new device icon
-            var deviceIcon = new DeviceIcon(dName, devOrigin, dType, function(icon, file) {
-                icon.setUploadProgress(0, file.size);
-                icon.setUploadState("Conectando...");
-                icon.setUploadName(file.name);
-                icon.showUpload();
-                
-                rtcManager.NewConnection(dId);
-            
-            }, function(){}, function(){
-                
-            
-            
-            });
-            
-            devices[dId].Icon = deviceIcon; //put the icon ref in the new device object
+            //creates new object for the arrived device and put the device obj in the devices array  
+            devices[dId] = new Device(dId, dName, dOrigin, dType);
         });       
         
         wSocket.emit("joinSession", localIp, sessionAddr, username, deviceType);
     });
     
     wSocket.on("peerDataError", function(destId, data) {
-        ShowTempMessage("Error: Peer data sent error =(", 5000, "#800");    
+        ShowTempMessage("Error: Peer data sent error =(", 5000, "#f00");    
     });
     
     wSocket.on("peerClosure", function(closedId) {
         if(!devices[closedId])  //checks if the id is not present on this instance
-            return; //if so, return and do nothing      
-            
-        //Close the correspondent icon
-        devices[closedId].Icon.DeleteDevice();
+            return; //if so, return and do nothing 
         
-        ShowTempMessage(devices[closedId].devName + " has disconnected.", 3000, "#800");
+        ShowTempMessage(devices[closedId].name + " has disconnected.", 3000, "#f00");
+    
+        devices[closedId].Delete(); //execute sequences to delete this device
         
         delete devices[closedId];   //deletes the device reference from the devices array
         
-        /*if(hostId) //if got host id, means you not are the host, breaks
-            return;
-        
-        broadcastData(myConnId,80,closeId);
-                
-        if(rtcConnections[closeId]) //check if this peer got any connection with the host
+ 
+        /*if(rtcConnections[closeId]) //check if this peer got any connection with the host
             rtcConnections[closeId].close();  //if so close it
                 
         for(var fileId in RemoteFiles) {    //iterate thru all the disconnected client files
@@ -174,8 +144,73 @@ function main() {
     wSocket.connect("ws://" + wsUrl);
 }
 
+function OnDataChannelConnection(id, dataChannel) {
+    if(!devices[id]) {   //if this device id does not exists
+        dataChannel.close();    //close it
+        log("Error: This device does not exists");
+        return;
+    } else if(devices[id].dataChannel) {   //if its connection is already stabilished
+        dataChannel.close();    //close it
+        log("Error: Connection to this host already stabilished.");
+        return;
+    }
+    
+    devices[id].dataChannel = dataChannel; //put this data channel ref in the channels array
+    
+    log("New DataChannel Opened.");
+        
+    dataChannel.on("error", function(err) {
+        log(err);    
+    });
+        
+    dataChannel.on("ArrayBuffer", function(data) {
+        log("ArrayBuffer received");    
+    });
+        
+    dataChannel.on("Blob", function(data) {
+        log("Blob received");    
+    });
+        
+    dataChannel.on("close", function() {
+        if(!devices[id] || !devices[id].dataChannel) {   //if this connection id already exists
+            log("Error: Data channel closed is not listed.");
+            return;
+        }
+        
+        //Close everything related to dataChannel here
+        delete devices[id].dataChannel;    //delete datachannel ref from this array
+        log("DataChannel closed.");
+    });
+    
+    dataChannel.on("NewDownload", function(fileId) {
+        var fileInfo = getFileInfo(fileId);
+        
+        ShowPopup(devices[id], "Quer te enviar o arquivo:", fileInfo, "Aceitar", "Recusar", function() {
+        //Accept callback    
+            
+        }, function() {
+            //Refuse callback    
+            dataChannel.emit("DownloadRefused", fileId);
+        });
+        
+    });
+    
+    dataChannel.on("DownloadRefused", function(fileId) {
+        if(devices[id]) {
+            devices[id].CancelUpload(false);
+            ShowTempMessage(devices[id].name + " recusou o arquivo.", 5000, "#f00");   
+        }          
+    });
+
+    
+    if(dcOpenCallback[id]) { //if there is some callback in dcOpenQueue for this id       
+        dcOpenCallback[id]();  //execute the callback        
+        delete dcOpenCallback[id]; //delete this id queue on finished        
+    }
+}
+
 function CheckCompatibility() {
-    return isRTCReady();
+    return isRTCReady() && isFileAPIReady();
     //must check whether websocket is available, despite something have webrtc and dont have websocket isn't very possible
 }
 
@@ -211,35 +246,94 @@ function checkCompatibilityAndStart(sessionId, user) {
     }
 }
 */
-/*
-function requestConnection(remoteId) {
-    var newRtcConn = new RTCDataChannel(null);
-            
-    rtcConnections[remoteId] = newRtcConn;
-            
-    newRtcConn.onOfferReady = function(sdpOffer) {
-        sendPeerData(remoteId,{
-            type: "connRequest",
-            sdpOffer: hackSDP(sdpOffer)
-        });
-    };
-            
-    newRtcConn.onIceCandidate = function(candidate) {     
-        sendPeerData(remoteId,{
-            type: "iceCand",
-            candidate: candidate
-        });
-    };
-            
-    newRtcConn.createOffer();
-    
-    return newRtcConn;
-}*/
 
-function sendPeerData(destId, data) {
-    //in the future, maybe use query id
-    wSocket.emit("peerData", destId, data);
+function Device(id, name, origin, type) {
+    
+    var self = this;
+    
+    this.id = id;
+    this.name = name;   
+    this.origin = origin = (origin == "local") ? "Dispositivo Local" : "Dispositivo de Sessão";
+    this.type = type;
+    
+    this.dataChannel;   //var to store device dataChannel reference
+    this.localFile;     //var to store local file reference
+    this.remoteFile;    //var to store remote file reference
+    
+    //creates a new device icon
+    this.icon = new DeviceIcon(name, origin, type, function(icon, file) {
+        //FileUpload Callback
+                
+        if(self.localFile)  //if some local file is already stabilished,    
+            return; //do nothing and return
+                
+        var fileId = getFileId(file),   //get the file id
+            localFile = new LocalFile(fileId, file);   //create a new local file instance
+        
+        self.localFile = localFile; //put this local file ref in the device ref
+                
+        localFile.onChunkRead = function(chunkData, destId) {
+            //Send Chunk Data
+            if(self.dataChannel)     //verify if the channel is available
+                self.dataChannel.sendRaw(chunkData);
+                    
+            chunkData = null; //clear chunk data ref
+        };
+                
+        icon.setUploadProgress(0, file.size);
+        icon.setUploadName(file.name);
+                
+        if(self.dataChannel) {  //check if this device connection already exists,
+            self.dataChannel.emit("NewDownload", fileId);
+            icon.setUploadState("Aguardando...");    
+                    
+        } else {    //if not,  
+            icon.setUploadState("Conectando...");
+            rtcManager.NewConnection(id);  //create new connection to this id 
+            dcOpenCallback[id] = function() {
+                self.dataChannel.emit("NewDownload", fileId);
+                icon.setUploadState("Aguardando..."); 
+            }
+        }
+                
+        icon.showUpload();
+                
+    }, function(){
+        //File Download Hold callback
+    }, function(){
+        //File Upload hold callback
+    });
+    
+    this.CancelDownload = function(sendCancelMsg) {
+        
+        
+    };
+    
+    this.CancelUpload = function(sendCancelMsg) {
+        self.icon.hideUpload();   //hide the upload interface
+        if(self.localFile) {
+            self.localFile.handler = null;   //clear the local file handler
+            delete self.localFile;   //delete local file reference
+            
+            if(sendCancelMsg && self.dataChannel)
+                self.dataChannel.emit("CancelUpload");    
+        }
+    };
+    
+    this.Delete = function() {
+        //Close the correspondent icon
+        self.icon.DeleteDevice();
+        
+        self.CancelDownload();
+        self.CancelUpload();
+          
+        if(self.dataChannel)  //if this data channel id is active,
+            self.dataChannel.close(); //close it
+    }
 }
+
+
+
 
 function SendRTCData(destId, dataCode, data) {
     if(!rtcConnections[destId] || !rtcConnections[destId].readyState()){
@@ -267,12 +361,12 @@ function SendRTCData(destId, dataCode, data) {
     return true;
 }
 
-function SendChunkData(destId, chunkData) {
+/*function SendChunkData(destId, chunkData) {
     if(!rtcConnections[destId] || !rtcConnections[destId].readyState())     //verify if the channel is available to send message
         return false;   //if not, return false
     rtcConnections[destId].sendData(chunkData);
     return true;
-}
+}*/
 
 function handleData(senderId, recData) {
     if(recData.byteLength) {  //check if this is a file chunk (check a ArrayBuffer member)
@@ -442,42 +536,10 @@ function handleData(senderId, recData) {
 
 
 
-function broadcastData(senderId, dataCode, data, loopback) {  //loopback for signaling whether the sender wants to receive the msg
-    if(hostId)  //if got any host id, that mean that the connection is not the host
-        SendRTCData(hostId, 5, { code: dataCode, data: data }); // and must send the broadcast packet to host
-    else
-        for (var connId in rtcConnections)   //iterate thru all the stabilished connections with the host,
-            if(connId != senderId)
-                SendRTCData(connId, dataCode, data); // and send them the packet received 
-}
 
-function broadcastMsg(message) {   
-    broadcastData(myConnId, 10, message);  //broadcast data with data code 10 - msg code
-}
 
-function hackSDP(sdp) {
-/*    var split = sdp.split("b=AS:30");
-    if(split.length > 1)
-        var newSDP = split[0] + "b=AS:1638400" + split[1];
-    else
-        newSDP = sdp;
-        return newSDP;*/
-    
-    return sdp;
-}
 
-function sendText(){
-    var inputTxt = document.getElementById("inputArea");
-    
-    if(inputTxt.value == "")
-        return;
-    
-    broadcastMsg(username + ": " + inputTxt.value);
-    putPanelMsg(username + ": " + inputTxt.value);
 
-    inputTxt.value = "";
-    inputTxt.focus();
-}
 
 function encode(dataArray) {   
     var result = "";    
