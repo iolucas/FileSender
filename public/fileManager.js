@@ -1,6 +1,9 @@
 var DeletationArray = [];
 
-document.getElementById("files").addEventListener("change", function(event) {
+var chunkSize = 16000;  //if we use more than 16kb files get corrupted on fire fox
+var chunksPerAck = 16;
+
+/*document.getElementById("files").addEventListener("change", function(event) {
     var files = event.target.files; // get the files selected in the input file
 
     for (var i = 0; i < files.length; i++) {  //iterate thru the selected elements
@@ -13,18 +16,12 @@ document.getElementById("files").addEventListener("change", function(event) {
             continue;   //proceed to next file
                
         newLocalFile.onChunkRead = function(chunkData, chunkInfo) {
-            SendChunkData(chunkInfo, chunkData);
+            //SendChunkData(chunkInfo, chunkData);
             chunkData = null;
         };
         
         var newIcon = CreateIcon(fileId, newLocalFile.name, newLocalFile.type, newLocalFile.size, "Hold for delete", username);  
 
-        /*newIcon.onClick = function() {
-            DeleteLocalFile(fileId);
-            DeleteIcon(fileId);   
-            //broadcastData(encode([31]) + fileId); //broadcast file remove
-            broadcastData(myConnId, 31, fileId); //broadcast file remove
-        };*/
         
         newIcon.onMouseDown = function(caller) {            
             caller.clicked = true;           
@@ -63,7 +60,7 @@ document.getElementById("files").addEventListener("change", function(event) {
     }
    
     document.getElementById("files").value = "";    //clear input file data to be able load same data if need in the next operation
-});
+});*/
 
 function DeleteFiles() {
     for(var fileId in DeletationArray) {
@@ -86,7 +83,7 @@ function isFileAPIReady() {
 var LocalFiles = [];
 var RemoteFiles = [];
 
-
+/*
 function CreateLocalFile(fileId, fileHandler) {
     if(LocalFiles[fileId])  //checks whether this id already exists, if so, return null
         return null; 
@@ -95,8 +92,9 @@ function CreateLocalFile(fileId, fileHandler) {
     LocalFiles[fileId] = newLocalFile;  //assign the new object to the collection id
         
     return newLocalFile;    //if everything were sucessfull, return the file created reference
-}
+}*/
 
+/*
 function DeleteLocalFile(fileId) {
     if(!LocalFiles[fileId])  //checks whether this id already exists, if not, return false
         return false; 
@@ -104,7 +102,7 @@ function DeleteLocalFile(fileId) {
     delete LocalFiles[fileId];    //delete local file from the collection     
         
     return true;    //if everything were sucessfull, return true
-}
+}*/
 
 function CreateRemoteFile(fileId, fileObject, fileOwnerId, fileOwnerName) {
     
@@ -185,19 +183,22 @@ function RemoteFile(fileId, fileObject, fileOwnerId, fileOwnerName) {
     this.downloaded = false;
 }
 
-function getFileId(fileObject, ownerId) {
-    return [fileObject.name, fileObject.size, fileObject.type, fileObject.lastModified, ownerId].join("*");    
+function getFileId(fileObject) {
+    //return [fileObject.name, fileObject.size, fileObject.type, fileObject.lastModified, ownerId].join("*");
+    return [fileObject.name, fileObject.size, fileObject.type, fileObject.lastModified].join("*"); 
 }
 
 function getFileInfo(fileId) {
     var fileObjArr = fileId.split("*");
     
-    return [{
+    return { name: fileObjArr[0], size: fileObjArr[1], type: fileObjArr[2], lastModified: fileObjArr[3] };
+    
+    /*return [{
         name: fileObjArr[0],
         size: fileObjArr[1],
         type: fileObjArr[2],
         lastModified: fileObjArr[3]
-    },fileObjArr[4]];
+    },fileObjArr[4]];*/
 }
 
 
