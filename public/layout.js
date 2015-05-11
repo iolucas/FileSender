@@ -263,17 +263,6 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     this.DeleteDevice = function() {
         parent.removeChild(newDevice);         
     };
-    
-    function getSizeWord(size) {    
-        if(size < 1000)
-            return size + " bytes";
-        else if(size < 1000000)
-            return (size/1024).toFixed(1) + " kB";
-        else if(size < 1000000000)
-            return (size/1048576).toFixed(1) + " MB";
-        else //if(size < 1000000000000)
-            return (size/1073741824).toFixed(1) + " GB";   
-    }
 }
 
 function SetLocalUser(localName, sessionName, deviceType) {
@@ -289,18 +278,21 @@ function SetLocalUser(localName, sessionName, deviceType) {
     document.getElementById("user").style.display = "table";
 }
 
-function ShowPopup(deviceName, deviceOrigin, deviceType, message, fileName, fileSize, acceptLabel, refuseLabel, acceptCallback, refuseCallback){   
+function ShowPopup(device, message, file, acceptLabel, refuseLabel, acceptCallback, refuseCallback){   
+    
+    //var deviceOrigin = device.devOrigin == "local" ? "Dispositivo Local" : "Dispositivo de Sessão";
+    
     var parent = document.body;
     var table = document.createElement("table");
     table.setAttribute("class", "screenDisabled");    
     var imgSrc = "";   
-    if(deviceType == "mobile")
+    if(device.type == "mobile")
         imgSrc = "img/mob.png";
-    else if(deviceType == "tablet")
+    else if(device.type == "tablet")
         imgSrc = "img/tab.png";
     else
         imgSrc = "img/comp.png";    
-    table.innerHTML = "<tr><td><table class='popupWindow'><tr><td class='mainImgTd' style='height: 1px;'><img src='" + imgSrc + "' class='mainImg'></td><td class='deviceName'>" + deviceName + "<br><span>" + deviceOrigin + "</span></td></tr><tr><td colspan='2' style='height: 1px;'>" + message + "</td></tr><tr><td colspan='2' style='height: 1px;'>" + fileName + "<br>" + fileSize + "</td></tr><tr><td colspan='2'><span id='refuse' class='popupButton'>" + refuseLabel + "</span><span id='accept' class='popupButton'>" + acceptLabel + "</span></td></tr></table></td></tr>";   
+    table.innerHTML = "<tr><td><table class='popupWindow'><tr><td class='mainImgTd' style='height: 1px;'><img src='" + imgSrc + "' class='mainImg'></td><td class='deviceName'>" + device.name + "<br><span>" + device.origin + "</span></td></tr><tr><td colspan='2' style='height: 1px;'>" + message + "</td></tr><tr><td colspan='2' style='height: 1px;'>" + file.name + "<br>" + getSizeWord(file.size) + "</td></tr><tr><td colspan='2'><span id='refuse' class='popupButton'>" + refuseLabel + "</span><span id='accept' class='popupButton'>" + acceptLabel + "</span></td></tr></table></td></tr>";   
     parent.style.overflow = "hidden";  //hiddes the navigation bar in case content is greater than the screen, bug in case more than one is opened   
     parent.appendChild(table); 
     document.getElementById("accept").addEventListener("click", function() {           
@@ -313,6 +305,17 @@ function ShowPopup(deviceName, deviceOrigin, deviceType, message, fileName, file
         parent.style.overflow = "visible";
         refuseCallback();  
     });
+}
+
+function getSizeWord(size) {    
+    if(size < 1000)
+        return size + " bytes";
+    else if(size < 1000000)
+        return (size/1024).toFixed(1) + " kB";
+    else if(size < 1000000000)
+        return (size/1048576).toFixed(1) + " MB";
+    else //if(size < 1000000000000)
+        return (size/1073741824).toFixed(1) + " GB";   
 }
 
 function ShowMenu() {
