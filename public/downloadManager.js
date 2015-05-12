@@ -106,6 +106,8 @@ function DownloadFile(fileId, fileName, fileSize, fileType) {
     
     var buffer = [];    //file buffer to store the remote file data
     
+    var canceled = false;
+    
     var recBuffLength = 0;  //var to store the amount of data already received
     self.getLen = function() {return recBuffLength;};
     var currChunkPointer = 0 - chunksPerAck;   //pointer to reference the next initial chunk value (the operation is a hack to make it start at 0)
@@ -154,6 +156,17 @@ function DownloadFile(fileId, fileName, fileSize, fileType) {
     }
     
     self.CancelDownload = function() {
+
+        canceled = true;    //cancel download flag
+        
+        buffer = null;  //clear the download buffer reference
+        
+        //remove this file from the file system
+        fileSystem.root.getFile(fileName, { create: false }, function(fileEntry) { //try to open the file
+            fileEntry.remove(function() {  //if it open sucessfully, remove it
+            }, function(e) {});       
+        }, function(e) {});
+        
         if(self.onDownloadCanceled)
             self.onDownloadCanceled();              
     };
@@ -232,9 +245,15 @@ function DownloadFile(fileId, fileName, fileSize, fileType) {
                 // Create a new Blob and write it
                 fileWriter.write(new Blob(buffer, { type: self.type }));
                 
-            }, function(e){alert("error1" + e.name + " " + e.message);});   
+            }, function(e){
+                if(!canceled)   //if download is not canceled, so handle the error
+                    alert("error1" + e.name + " " + e.message);
+            });   
         
-        }, function(e){alert("error2" + e.name + " " + e.message);});
+        }, function(e){
+            if(!canceled)   //if download is not canceled, so handle the error
+                alert("error2" + e.name + " " + e.message);
+        });
     }
 }
 
