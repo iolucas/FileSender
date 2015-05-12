@@ -154,7 +154,7 @@ function LocalFile(fileId, fileHandler) {
         var fileBlob = self.handler.slice(chunkNum*chunkSize, chunkNum*chunkSize + chunkSize);
         var reader = new FileReader();  //create new file reader instance
         
-        reader.onloadend = function(evt) {        //set callback when the fileBlob read is complete  
+        reader.onloadend = function(evt) {        //set callback when the fileBlob read is complete 
             if (self.onChunkRead && reader.readyState == FileReader.DONE)
                 self.onChunkRead(evt.target.result, chunkInfo);  //fires the chunk read callback once the chunk has been read
         };
