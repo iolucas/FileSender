@@ -200,16 +200,16 @@ function DataChannel(peerConnection, dataChannel) {
         //Firefox only see blobs and strings and send blobs
         //Chrome only see ArrayBuffer and strings and can't send blobs
         //Opera acts like chrome
-        
+
         //check if this is a check an ArrayBuffer and its event is signed (Chrome and Opera)
         if(message.data.byteLength && events["ArrayBuffer"]) {    
             for(cbIndex in events["ArrayBuffer"])   //for each callback in the ArrayBuffer event
-                events["ArrayBuffer"][cbIndex].apply(this, message.data); //fire with the arrayBuffer data and its scope as "this" value
+                events["ArrayBuffer"][cbIndex].call(this, message.data); //fire with the arrayBuffer data and its scope as "this" value
             return; //do nothing else and return
         }   //if not, check if this is an object, means that is a Blob for (Firefox) and its event is signed
         else if(typeof message.data == "object" && events["Blob"]) { 
             for(cbIndex in events["Blob"])   //for each callback in the ArrayBuffer event
-                events["Blob"][cbIndex].apply(this, message.data); //fire with the arrayBuffer data and its scope as "this" value
+                events["Blob"][cbIndex].call(this, message.data); //fire with the arrayBuffer data and its scope as "this" value
             return; //do nothing else and return
         }
         
