@@ -72,6 +72,7 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     fileInput.addEventListener("change", function(event) {
         var file = event.target.files; // get the files selected in the input file
         uploadCallback(self, file[0]);
+        fileInput.value = "";    //clear input file data to be able load same data if need in the next operation
     });
     
     var upIcoTd = document.createElement("td");
@@ -95,7 +96,7 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     download.addEventListener("mousedown", function() {
         downTimeOut = setTimeout(function() {
             cancelDownCallback(self);
-        }, 2000);
+        }, 1000);
     });
     
     download.addEventListener("mouseup", function() {
@@ -137,7 +138,7 @@ function DeviceIcon(deviceName, deviceOrigin, deviceType, uploadCallback, cancel
     upload.addEventListener("mousedown", function() {
         upTimeOut = setTimeout(function() {
             cancelUpCallback(self);
-        }, 2000);
+        }, 1000);
     });
     
     upload.addEventListener("mouseup", function() {
