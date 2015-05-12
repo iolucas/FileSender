@@ -78,12 +78,11 @@ function main() {
                 wSocket.close();    //then, close the connection
                 return; //and return
             }
-
-            /*  LATER WE TURN THIS ON    
+ 
             window.onbeforeunload = function() {
-                if(lengthOf(rtcConnections))
+                if(lengthOf(devices))
                 return "Hey, your session is still active!";       
-            }*/           
+            }           
 
             ShowTempMessage("Conectado!", 3000);
         });
@@ -115,20 +114,6 @@ function main() {
         
         delete devices[closedId];   //deletes the device reference from the devices array
         
- 
-        /*if(rtcConnections[closeId]) //check if this peer got any connection with the host
-            rtcConnections[closeId].close();  //if so close it
-                
-        for(var fileId in RemoteFiles) {    //iterate thru all the disconnected client files
-            if(RemoteFiles[fileId].FileOwnerId == closeId) {   //check if the file belongs to the connection
-                DeleteRemoteFile(fileId);
-                        
-                if(currDownload && currDownload.id == fileId)
-                    currDownload.CancelDownload();
-                else
-                    DeleteIcon(fileId); //remove the file icon
-            }
-        }*/
     });
     
 
@@ -170,11 +155,6 @@ function OnDataChannelConnection(id, dataChannel) {
         if(device.download) {
             device.download.setFileChunk(data); //if so, set the file chunk
             device.icon.setDownloadProgress(device.download.getLen(), device.download.size);
-            /*if(currDownload) {  //if the still isn't complete, update its info
-                var percent = currDownload.getProgress();   //the the percentage value of the progress
-                Icons[currDownload.id].ChangeLoadPct(percent);   //change the load bar of the receiving file  
-                Icons[currDownload.id].ChangeIconMsg("Downloading... " + percent + "%");    //change the load msg of the receving file
-            }*/
         }
         
     });
@@ -183,7 +163,6 @@ function OnDataChannelConnection(id, dataChannel) {
         log("Blob received");  
         var fileReader = new FileReader();
         fileReader.onload = function() {
-            //handleData(senderId, this.result);
             
             if(device.download) {
                 device.download.setFileChunk(this.result); //if so, set the file chunk
@@ -198,6 +177,16 @@ function OnDataChannelConnection(id, dataChannel) {
         if(!device || !device.dataChannel) {   //if this connection id already exists
             log("Error: Data channel closed is not listed.");
             return;
+        }
+        
+        if(device.download) {
+            device.CancelDownload(false);
+            ShowTempMessage("Download cancelado.", 4000, "#f00");
+        }
+        
+        if(device.localFile) {
+            device.CancelUpload(false);
+            ShowTempMessage("Upload cancelado.", 4000, "#f00");
         }
         
         //Close everything related to dataChannel here
@@ -220,20 +209,20 @@ function OnDataChannelConnection(id, dataChannel) {
             
             device.download = new DownloadFile(fileId,fileInfo.name, fileInfo.size, fileInfo.type);
             device.download.onChunkRequest = function(fileId, chunkPointer) {
-                device.dataChannel.emit("ChunkReq", fileId, chunkPointer);
-                //SendRTCData(remoteFile.FileOwnerId, 44, { fileId: fileId, chunkPointer: chunkPointer });    //request chunk  
+                if(device.dataChannel)
+                    device.dataChannel.emit("ChunkReq", fileId, chunkPointer);
             };
             
-            device.download.onDownloadComplete = function() {         
-                device.download = null;  //clear download instance register
-                device.icon.setDownloadState("Download completo!");   
+            device.download.onDownloadComplete = function() { 
+                device.CancelDownload(false);
+                ShowTempMessage("Download Completo.", 3000);
             }
             
             device.download.onDownloadCanceled = function() {
-                device.download = null;  //clear download instance register
+                delete device.download;  //clear download instance register
                 
-                ShowTempMessage("Download cancelado", 4000, "#f00");
-                device.icon.setDownloadState("Download cancelado.");  
+                ShowTempMessage("Download cancelado.", 4000, "#f00");
+                //device.icon.setDownloadState("Download cancelado.");  
             }
     
             device.download.StartRequestChunk();   //start the requesting chunk proceedures 
@@ -263,6 +252,17 @@ function OnDataChannelConnection(id, dataChannel) {
                 device.localFile.readChunk(chunkPointer + i, null);
         }
     });
+    
+    dataChannel.on("CancelDownload", function() {
+        ShowTempMessage("Download cancelado.", 4000, "#f00");
+        device.CancelDownload(false);
+        
+    });
+    
+    dataChannel.on("CancelUpload", function() {
+        ShowTempMessage("Upload cancelado.", 4000, "#f00");
+        device.CancelUpload(false);
+    });
 
     
     if(dcOpenCallback[id]) { //if there is some callback in dcOpenQueue for this id       
@@ -272,33 +272,34 @@ function OnDataChannelConnection(id, dataChannel) {
 }
 
 function CheckCompatibility() {
+    //return error page
     return isRTCReady() && isFileAPIReady();
     //must check whether websocket is available, despite something have webrtc and dont have websocket isn't very possible
 }
 
 /*
-function checkCompatibilityAndStart(sessionId, user) {
+function CheckCompatibility2() {
     
     if (!isRTCReady()) {
         //in the final version, only say that the browser doesn't support the system
-        putScreenMsg("The WebRTC APIs are not fully supported in this browser. =/");
+        //putScreenMsg("The WebRTC APIs are not fully supported in this browser. =/");
         //putScreenMsg("Unfortunatelly qeek.me is not supported in this browser. =/");
         //putScreenMsg("Use the last versions of Chrome or Firefox");
-        return;       
+        return false;       
     } 
     
     if(!isFileAPIReady()) {
-        putScreenMsg("The File APIs are not fully supported in this browser. =/");
+        //putScreenMsg("The File APIs are not fully supported in this browser. =/");
         //putScreenMsg("Unfortunatelly qeek.me is not supported in this browser. =/");
         //putScreenMsg("Use the last versions of Chrome or Firefox");
-        return;
+        return false;
     }
     
     if(!window.requestFileSystem) {
         putScreenMsg("The File System are not fully supported in this browser. =/");
         //putScreenMsg("Unfortunatelly qeek.me is not supported in this browser. =/");
         //putScreenMsg("Use the last versions of Chrome or Firefox");
-        return;
+        return false;
     } else {
         window.requestFileSystem(window.TEMPORARY, 1, function(fs) { //try to request a filesystem to verify its availability
             main(sessionId, user);  //Ok, the browser support all we need
@@ -306,8 +307,8 @@ function checkCompatibilityAndStart(sessionId, user) {
             putScreenMsg("The File System are not able to run on private mode. =/");
         });
     }
-}
-*/
+}*/
+
 
 function Device(id, name, origin, type) {
     
@@ -344,7 +345,9 @@ function Device(id, name, origin, type) {
                 icon.setUploadProgress(localFile.sent,localFile.size);
                 
                 if(localFile.sent == localFile.size) {
-                    icon.setUploadState("Transferência Completa");
+                    //icon.setUploadState("Transferência Completa");
+                    ShowTempMessage("Transferência Completa!", 3000);
+                    self.CancelUpload(false);
                 }
             }
             chunkData = null; //clear chunk data ref
@@ -370,12 +373,25 @@ function Device(id, name, origin, type) {
                 
     }, function(){
         //File Download Hold callback
+        ShowPopup(self, "Deseja realmente interromper o download do arquivo:", self.download, "Sim", "Não", function() {
+            self.CancelDownload(true);
+        }, function() {});
     }, function(){
         //File Upload hold callback
+        ShowPopup(self, "Deseja realmente interromper o upload do arquivo:", self.localFile, "Sim", "Não", function() {
+            self.CancelUpload(true);
+        }, function() {});
     });
     
     this.CancelDownload = function(sendCancelMsg) {
-        
+        self.icon.hideDownload();   //hide the upload interface
+        if(self.download) {
+            self.download.CancelDownload();
+            delete self.download;   //delete local file reference
+            
+            if(sendCancelMsg && self.dataChannel)
+                self.dataChannel.emit("CancelUpload");  //inverted cause for the other use its an upload     
+        }
         
     };
     
@@ -385,8 +401,8 @@ function Device(id, name, origin, type) {
             self.localFile.handler = null;   //clear the local file handler
             delete self.localFile;   //delete local file reference
             
-            //if(sendCancelMsg && self.dataChannel)
-                //self.dataChannel.emit("CancelUpload");    
+            if(sendCancelMsg && self.dataChannel)
+                self.dataChannel.emit("CancelDownload");  //inverted cause for the other use its a download  
         }
     };
     
@@ -401,64 +417,6 @@ function Device(id, name, origin, type) {
             self.dataChannel.close(); //close it
     }
 }
-
-
-
-
-function SendRTCData(destId, dataCode, data) {
-    if(!rtcConnections[destId] || !rtcConnections[destId].readyState()){
-       
-        //verify if the channel is available to send message
-        return false;   //if not, return false
-    }
-    
-    if(dataCode && data)
-        rtcConnections[destId].sendData(getDataStr({
-            code: dataCode,
-            data: data
-        }));
-    else if(dataCode)
-        rtcConnections[destId].sendData(getDataStr({
-            code: dataCode
-        }));
-    else if(data)
-        rtcConnections[destId].sendData(getDataStr({
-            data: data
-        }));
-    else
-        return false;
-    
-    return true;
-}
-
-/*function SendChunkData(destId, chunkData) {
-    if(!rtcConnections[destId] || !rtcConnections[destId].readyState())     //verify if the channel is available to send message
-        return false;   //if not, return false
-    rtcConnections[destId].sendData(chunkData);
-    return true;
-}*/
-
-function handleData(senderId, recData) {
-    if(recData.byteLength) {  //check if this is a file chunk (check a ArrayBuffer member)
-
-        return; //than, return
-        
-    } else if(typeof recData == "object" && !recData.code) { //blob to be converted
-
-    }
-
-
-
-
-   
-}
-
-
-
-
-
-
-
 
 function encode(dataArray) {   
     var result = "";    
