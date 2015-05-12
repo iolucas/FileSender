@@ -119,7 +119,6 @@ function main() {
 
     //CHANGE FOR DEVICE DATA
     wSocket.on("peerData", function(senderId, data) {
-        log(data);
         rtcManager.HandleData(senderId, data);    
     });
     
@@ -143,8 +142,6 @@ function OnDataChannelConnection(id, dataChannel) {
     }
     
     device.dataChannel = dataChannel; //put this data channel ref in the channels array
-    
-    log("New DataChannel Opened.");
         
     dataChannel.on("error", function(err) {
         log(err);    
@@ -214,7 +211,9 @@ function OnDataChannelConnection(id, dataChannel) {
             };
             
             device.download.onDownloadComplete = function() { 
-                device.CancelDownload(false);
+                //device.CancelDownload(false);
+                device.icon.hideDownload();
+                device.download = null;
                 ShowTempMessage("Download Completo.", 3000);
             }
             
@@ -222,7 +221,6 @@ function OnDataChannelConnection(id, dataChannel) {
                 delete device.download;  //clear download instance register
                 
                 ShowTempMessage("Download cancelado.", 4000, "#f00");
-                //device.icon.setDownloadState("Download cancelado.");  
             }
     
             device.download.StartRequestChunk();   //start the requesting chunk proceedures 
@@ -248,8 +246,7 @@ function OnDataChannelConnection(id, dataChannel) {
     
     dataChannel.on("ChunkReq", function(fileId, chunkPointer) {
         if(device.localFile) {
-            for(var i = 0; i < chunksPerAck;i++)
-                device.localFile.readChunk(chunkPointer + i, null);
+            device.localFile.readChunk(chunkPointer);
         }
     });
     
@@ -337,7 +334,7 @@ function Device(id, name, origin, type) {
                 
         localFile.sent = 0;
         
-        localFile.onChunkRead = function(chunkData, destId) {
+        localFile.onChunkRead = function(chunkData) {
             //Send Chunk Data
             if(self.dataChannel) {     //verify if the channel is available
                 self.dataChannel.sendRaw(chunkData);
