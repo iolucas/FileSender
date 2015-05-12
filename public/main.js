@@ -145,17 +145,19 @@ function main() {
 }
 
 function OnDataChannelConnection(id, dataChannel) {
-    if(!devices[id]) {   //if this device id does not exists
+    var device = devices[id];
+    
+    if(!device) {   //if this device id does not exists
         dataChannel.close();    //close it
         log("Error: This device does not exists");
         return;
-    } else if(devices[id].dataChannel) {   //if its connection is already stabilished
+    } else if(device.dataChannel) {   //if its connection is already stabilished
         dataChannel.close();    //close it
         log("Error: Connection to this host already stabilished.");
         return;
     }
     
-    devices[id].dataChannel = dataChannel; //put this data channel ref in the channels array
+    device.dataChannel = dataChannel; //put this data channel ref in the channels array
     
     log("New DataChannel Opened.");
         
@@ -164,30 +166,78 @@ function OnDataChannelConnection(id, dataChannel) {
     });
         
     dataChannel.on("ArrayBuffer", function(data) {
-        log("ArrayBuffer received");    
+
+        if(device.download) {
+            device.download.setFileChunk(data); //if so, set the file chunk
+            device.icon.setDownloadProgress(device.download.getLen(), device.download.size);
+            /*if(currDownload) {  //if the still isn't complete, update its info
+                var percent = currDownload.getProgress();   //the the percentage value of the progress
+                Icons[currDownload.id].ChangeLoadPct(percent);   //change the load bar of the receiving file  
+                Icons[currDownload.id].ChangeIconMsg("Downloading... " + percent + "%");    //change the load msg of the receving file
+            }*/
+        }
+        
     });
         
     dataChannel.on("Blob", function(data) {
-        log("Blob received");    
+        log("Blob received");  
+        var fileReader = new FileReader();
+        fileReader.onload = function() {
+            //handleData(senderId, this.result);
+            
+            if(device.download) {
+                device.download.setFileChunk(this.result); //if so, set the file chunk
+                device.icon.setDownloadProgress(device.download.getLen(), device.download.size);
+            }
+        };
+        fileReader.readAsArrayBuffer(data);
+        return; 
     });
         
     dataChannel.on("close", function() {
-        if(!devices[id] || !devices[id].dataChannel) {   //if this connection id already exists
+        if(!device || !device.dataChannel) {   //if this connection id already exists
             log("Error: Data channel closed is not listed.");
             return;
         }
         
         //Close everything related to dataChannel here
-        delete devices[id].dataChannel;    //delete datachannel ref from this array
+        delete device.dataChannel;    //delete datachannel ref from this array
         log("DataChannel closed.");
     });
     
     dataChannel.on("NewDownload", function(fileId) {
         var fileInfo = getFileInfo(fileId);
         
-        ShowPopup(devices[id], "Quer te enviar o arquivo:", fileInfo, "Aceitar", "Recusar", function() {
-        //Accept callback    
+        ShowPopup(device, "Quer te enviar o arquivo:", fileInfo, "Aceitar", "Recusar", function() {
+            //Accept callback    
             
+            dataChannel.emit("DownloadAccepted", fileId);  
+            
+            device.icon.setDownloadName(fileInfo.name);
+            device.icon.setDownloadProgress(0, fileInfo.size);
+            device.icon.setDownloadState("Recebendo...");
+            device.icon.showDownload();
+            
+            device.download = new DownloadFile(fileId,fileInfo.name, fileInfo.size, fileInfo.type);
+            device.download.onChunkRequest = function(fileId, chunkPointer) {
+                device.dataChannel.emit("ChunkReq", fileId, chunkPointer);
+                //SendRTCData(remoteFile.FileOwnerId, 44, { fileId: fileId, chunkPointer: chunkPointer });    //request chunk  
+            };
+            
+            device.download.onDownloadComplete = function() {         
+                device.download = null;  //clear download instance register
+                device.icon.setDownloadState("Download completo!");   
+            }
+            
+            device.download.onDownloadCanceled = function() {
+                device.download = null;  //clear download instance register
+                
+                ShowTempMessage("Download cancelado", 4000, "#f00");
+                device.icon.setDownloadState("Download cancelado.");  
+            }
+    
+            device.download.StartRequestChunk();   //start the requesting chunk proceedures 
+                
         }, function() {
             //Refuse callback    
             dataChannel.emit("DownloadRefused", fileId);
@@ -196,10 +246,22 @@ function OnDataChannelConnection(id, dataChannel) {
     });
     
     dataChannel.on("DownloadRefused", function(fileId) {
-        if(devices[id]) {
-            devices[id].CancelUpload(false);
-            ShowTempMessage(devices[id].name + " recusou o arquivo.", 5000, "#f00");   
+        if(device) {
+            device.CancelUpload(false);
+            ShowTempMessage(device.name + " recusou o arquivo.", 5000, "#f00");   
         }          
+    });
+    
+    dataChannel.on("DownloadAccepted", function(fileId) {
+        if(device.localFile)
+            device.icon.setUploadState("Enviando...");        
+    });
+    
+    dataChannel.on("ChunkReq", function(fileId, chunkPointer) {
+        if(device.localFile) {
+            for(var i = 0; i < chunksPerAck;i++)
+                device.localFile.readChunk(chunkPointer + i, null);
+        }
     });
 
     
@@ -272,11 +334,19 @@ function Device(id, name, origin, type) {
         
         self.localFile = localFile; //put this local file ref in the device ref
                 
+        localFile.sent = 0;
+        
         localFile.onChunkRead = function(chunkData, destId) {
             //Send Chunk Data
-            if(self.dataChannel)     //verify if the channel is available
+            if(self.dataChannel) {     //verify if the channel is available
                 self.dataChannel.sendRaw(chunkData);
-                    
+                localFile.sent += chunkData.byteLength;
+                icon.setUploadProgress(localFile.sent,localFile.size);
+                
+                if(localFile.sent == localFile.size) {
+                    icon.setUploadState("Transferência Completa");
+                }
+            }
             chunkData = null; //clear chunk data ref
         };
                 
@@ -315,8 +385,8 @@ function Device(id, name, origin, type) {
             self.localFile.handler = null;   //clear the local file handler
             delete self.localFile;   //delete local file reference
             
-            if(sendCancelMsg && self.dataChannel)
-                self.dataChannel.emit("CancelUpload");    
+            //if(sendCancelMsg && self.dataChannel)
+                //self.dataChannel.emit("CancelUpload");    
         }
     };
     
@@ -324,8 +394,8 @@ function Device(id, name, origin, type) {
         //Close the correspondent icon
         self.icon.DeleteDevice();
         
-        self.CancelDownload();
-        self.CancelUpload();
+        self.CancelDownload(true);
+        self.CancelUpload(true);
           
         if(self.dataChannel)  //if this data channel id is active,
             self.dataChannel.close(); //close it
@@ -370,168 +440,17 @@ function SendRTCData(destId, dataCode, data) {
 
 function handleData(senderId, recData) {
     if(recData.byteLength) {  //check if this is a file chunk (check a ArrayBuffer member)
-        if(RemoteFiles[currDownload.id].FileOwnerId == senderId) { //if so, check if the sender id is the owner of the file being downloaded
-            currDownload.setFileChunk(recData); //if so, set the file chunk
-            if(currDownload) {  //if the still isn't complete, update its info
-                var percent = currDownload.getProgress();   //the the percentage value of the progress
-                Icons[currDownload.id].ChangeLoadPct(percent);   //change the load bar of the receiving file  
-                Icons[currDownload.id].ChangeIconMsg("Downloading... " + percent + "%");    //change the load msg of the receving file
-            }
-        }
+
         return; //than, return
         
     } else if(typeof recData == "object" && !recData.code) { //blob to be converted
-        var fileReader = new FileReader();
-        fileReader.onload = function() {
-            handleData(senderId, this.result);
-        };
-        fileReader.readAsArrayBuffer(recData);
-        return; 
+
     }
 
-    /*----Messages Codes----//
-        
-    5-> General Broadcast   
-    10-> Text Message 
-    11-> Other
-    
-    //---------------------*/
-    
-    if(recData.code)    //if the received data is already "objtified"
-        var recDataObj = recData;   //keep it this way
-    else    //otherwise
-        var recDataObj = getDataObj(recData);   //objtifie it
-    
-    var dataCode = recDataObj.code;
-    
-    switch(dataCode) {    //checks the code of the data packet
-            
-        case 5: //code signalizing this should be broadcast to all connections
-            if(hostId)  //if got any host id, that mean that the connection is not the host and must not be able to broadcast
-                break;
-            
-            broadcastData(senderId, recDataObj.data.code, recDataObj.data.data);   //broadcast msg for all connections
-            handleData(senderId, recDataObj.data); //handle the packet on host connection 
-            
-            break;
-            
-        case 8: //code requesting update for all files opened
-            if(hostId)
-                break;
-            
-            for(fileId in LocalFiles)
-                SendRTCData(senderId, 30, { fileId: fileId, owner: username }); //send the file for the connection
-            
-            for(fileId in RemoteFiles)
-                SendRTCData(senderId, 30, { fileId: fileId, owner: RemoteFiles[fileId].FileOwnerName }); //send the file for the connection
-            
-            break;
-            
-        case 10:    //code for basic text msg
-            putPanelMsg(recDataObj.data);
-            break;
-            
-        case 30:    //code for data available
-            log(recDataObj);
-            var fileId = recDataObj.data.fileId;
-            var fileOwner = recDataObj.data.owner;
-            var fileInfo = getFileInfo(fileId);
-            var newRemoteFile = CreateRemoteFile(fileId, fileInfo[0], fileInfo[1], fileOwner); //create a file register with the received file data
-            
-            if(!newRemoteFile)  //if the file already exists, return
-                return;
-                
-            var newIcon = CreateIcon(fileId, newRemoteFile.name, newRemoteFile.type, newRemoteFile.size, "Click for download the file", fileOwner);
-    
-            newIcon.onClick = function() {
-                
-                if(newRemoteFile.downloaded)    //if the file has already been downloaded, return
-                    return;
-        
-                var requestDownload = function() {                           
-                    RequestDownload(fileId);
-                }
-                    
-                if(!rtcConnections[newRemoteFile.FileOwnerId]) { //if it is not connected to the remote host, connect it
-            
-                    var newRtcConn = requestConnection(newRemoteFile.FileOwnerId);
-                        newRtcConn.onChannelOpen += function() {
-                        //requestDownload();          //not working =\  
-                            //alert("oieee");
-                    };       
- 
-                }
-                else {  //alert("already got connection");
-                    requestDownload();    
-                }
-            };
 
-            break;
-            
-        case 31:    //code for data available
-            
-            var fileId = recDataObj.data;
-            
-            DeleteRemoteFile(fileId); //remove a file register with the just received file data           
 
-            if(currDownload && currDownload.id == fileId)
-                currDownload.CancelDownload();
-            else
-                DeleteIcon(fileId); //remove the file icon
-            break;
-            
-        case 40: //code for request file for download
-            
-            var fileId = recDataObj.data;
-            
-            if(LocalFiles[fileId])    //check if the file exists
-                SendRTCData(senderId, 41, fileId);    //accepts downloads request
-            else
-                SendRTCData(senderId, 42, fileId);    //if the file were not found refuse the download
-            break;
-            
-        case 42: //code for download refused
-            //alert("download of " + encode(decData) + " has been refused.");
-            var fileId = recDataObj.data;
-            RefuseDownload(fileId);
 
-            //alert("download of " + fileId + " has been refused.");
-            
-            break;
-            
-        case 44: //request chunks
-            
-            var fileId = recDataObj.data.fileId,
-                chunkPointer = recDataObj.data.chunkPointer;
-            
-            if(LocalFiles[fileId]){
-                for(var i = 0; i < chunksPerAck;i++)
-                    LocalFiles[fileId].readChunk(chunkPointer + i, senderId);    
-            }
-            
-            break;
-            
-        case 80:
-            var closeId = recDataObj.data;
-                
-                if(rtcConnections[closeId]) //check if this peer got any connection with the host
-                    rtcConnections[closeId].close();  //if so close it
-                
-                for(var fileId in RemoteFiles) {    //iterate thru all the disconnected client files
-                    if(RemoteFiles[fileId].FileOwnerId == closeId) {   //check if the file belongs to the connection
-                        DeleteRemoteFile(fileId);          
-                        if(currDownload && currDownload.id == fileId)
-                            currDownload.CancelDownload();
-                        else
-                            DeleteIcon(fileId); //remove the file icon
-                    }
-                }
-            break;
-            
-        default:
-            log("ERROR: Not handled data. ID: " + senderId);
-            log("Object: " + recData);         
-    }
+   
 }
 
 
