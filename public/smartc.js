@@ -82,7 +82,8 @@ function SmartRTC(sendDataCallback) {
         };
         
         //create session descriptor offer and start gathering ice candidates
-        peerConnection.createOffer(function(sdpOffer) {                    
+        peerConnection.createOffer(function(sdpOffer) {
+            sdpOffer = hackSDP(sdpOffer);
             peerConnection.setLocalDescription(sdpOffer, function() {
                 //must check about the sdp hack to acelerate data speed        
                 sendDataCallback(targetId, { offer: sdpOffer });
@@ -133,7 +134,8 @@ function SmartRTC(sendDataCallback) {
                 
             peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer), function() {
                 //console.log("Remote descriptor accepted.");             
-                peerConnection.createAnswer(function(sdpAnswer) { 
+                peerConnection.createAnswer(function(sdpAnswer) {
+                    sdpAnswer = hackSDP(sdpAnswer);
                     peerConnection.setLocalDescription(sdpAnswer, function() {
                         sendDataCallback(senderId, { answer: sdpAnswer });
                         //console.log("Local peer sucessfully created.");
@@ -294,12 +296,12 @@ function DataChannel(peerConnection, dataChannel) {
 
 
 function hackSDP(sdp) {
-/*    var split = sdp.split("b=AS:30");
+
+    if (isFirefox) return sdp;
+    
+    var split = sdp.sdp.split("b=AS:30");
     if(split.length > 1)
-        var newSDP = split[0] + "b=AS:1638400" + split[1];
-    else
-        newSDP = sdp;
-        return newSDP;*/
+        sdp.sdp = split[0] + "b=AS:1638400" + split[1];
     
     return sdp;
 }
