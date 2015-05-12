@@ -1,5 +1,5 @@
-var chunkSize = 16000;  //if we use more than 16kb files get corrupted on fire fox
-var chunksPerAck = 16;
+//var chunkSize = 16000;  //if we use more than 16kb files get corrupted on fire fox
+//var chunksPerAck = 16;
 //var chunkTimeOut = 500; //time out in miliseconds until a chunk request is sent in case of no answer
 //since this time this is a reliable connection, timeout stuff wont be necessary
 
