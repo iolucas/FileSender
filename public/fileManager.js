@@ -1,7 +1,7 @@
 var DeletationArray = [];
 
 var chunkSize = 16000;  //if we use more than 16kb files get corrupted on fire fox
-var chunksPerAck = 16;
+var chunksPerAck = 32;
 
 /*document.getElementById("files").addEventListener("change", function(event) {
     var files = event.target.files; // get the files selected in the input file
@@ -143,26 +143,35 @@ function LocalFile(fileId, fileHandler) {
     self.onChunkRead;   //method to be called once the chunk has been read
     
     self.readChunk = function(chunkNum, chunkInfo) {
-        try{
-        //checks whether this id already exists, if not, return false
-        //checks whether the requested chunk number is not bigget than the file max chunk number, if so return false
+        try {
+            //checks whether this id already exists, if not, return false
+            //checks whether the requested chunk number is not bigget than the file max chunk number, if so return false
         
-        if(chunkNum > self.FileChunkQty - 1)  //if request chunk is greater than the maximum chunk number, return false
+            if(chunkNum > self.FileChunkQty - 1)  //if request chunk is greater than the maximum chunk number, return false
             return false;
 
-        //open file blob slice with the chunk limits specified
-        var fileBlob = self.handler.slice(chunkNum*chunkSize, chunkNum*chunkSize + chunkSize);
-        var reader = new FileReader();  //create new file reader instance
+            //open file blob slice with the chunk limits specified
+            var fileBlob = self.handler.slice(chunkNum*chunkSize, chunkNum*chunkSize + chunkSize*chunksPerAck);        
+            
+            var reader = new FileReader();  //create new file reader instance
         
-        reader.onloadend = function(evt) {        //set callback when the fileBlob read is complete 
-            if (self.onChunkRead && reader.readyState == FileReader.DONE)
-                self.onChunkRead(evt.target.result, chunkInfo);  //fires the chunk read callback once the chunk has been read
-        };
+            reader.onloadend = function(evt) {        //set callback when the fileBlob read is complete
+                if (self.onChunkRead && reader.readyState == FileReader.DONE) {
+                    var reqFileChunks = evt.target.result;
+                    for(var i = 0; i < chunksPerAck;i++) {
+                        //fires the chunk read callback once the chunk has been read
+                        self.onChunkRead(reqFileChunks.slice(i*chunkSize, i*chunkSize + chunkSize));     
+                    }
+                }
+            };
         
-        //reader.readAsBinaryString(fileBlob);    //async reads the file blob sliced
-        //try{
-        reader.readAsArrayBuffer(fileBlob);    //async reads the file blob sliced
-                    } catch(ex) {log(ex); alert(ex);}
+            //reader.readAsBinaryString(fileBlob);    //async reads the file blob sliced
+            //try{
+            reader.readAsArrayBuffer(fileBlob);    //async reads the file blob sliced
+        } catch(ex) {
+            log(ex); 
+            alert(ex);        
+        }
         return true;    //if everything were sucessfull, return true
     };
 }
