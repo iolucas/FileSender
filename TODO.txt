@@ -68,7 +68,7 @@ Modelo "filial" qeek.me, para atingit global e sempre ter um server perto de voc
 
 
 
-
+-   Implement system to manage file upload to detect upload finalization
 -   Implement each device queue of file to be sent
 -   Change msg ico to qeek.me logo fullfiled
 -   generate timeout in case joinSession is not send by connected client, disconnect it
