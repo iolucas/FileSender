@@ -4,7 +4,6 @@ NEXT TODO:
 
 GENERAL TODO:
 
--   Implement system like airdrop
 -   If we use more than 1 instances of maestro, if someone connects ws to one of them, won't be able to talk to the other in the other instance
 -   Create system in case server crash, retrieve connections in the best way in a mode that the user do not feel
 -   Follow and participate bluemix, nodejs and webrtc events to talk about qeekme
@@ -15,13 +14,10 @@ SERVER TODO:
 
 -   Periodic send isAlive data because bluemix is stucking connections up
 -   Must find away to implement lock in generating sessions to ensure not equal id is generated due to time issues (verify mongodb relation with this)
--   Change mode to elect new host based on statistics
 -   If server crashes, for now, only clear session members
--   Set timeout to answer error if took too long to get and address
 -   Every period, a "session garbage collector" will act to kill sessions not active for at least 1 day
 -   Sessions become not active after the last user disconnects
 -   Verify whether there is chance of two connections got the same id due to enter in the same in the db
--   At session join request, client will send its username, return the connection
 -   Check someway for have a public id and private id for security issues for client id
 -   Create system to store recently used connection ids to prevent them to be used
 -	Verify which point it tried to send data to not connected socket that are making the server to crash
@@ -35,7 +31,6 @@ CLIENT TODO:
 ----- NOW PRIORITIES  -----
 
 -   Create error page to be sent in case Id not exist
-
 -   Fix the error of exceeded quota (that means that chrome is not disposing the local storage temp files, must do this manually and files up to 5mb for example, should not use the local storage)
 -   Change the very first page due to small icons for recent sites in browsers be nice
 -   Put google search keywords
@@ -60,7 +55,7 @@ Modelo "filial" qeek.me, para atingit global e sempre ter um server perto de voc
 -   Must verify enhancements in the rtc connections
 --------------
 
--   create filesystem wrapper or use filer
+-   verify possibility of write blobs instead converted them to arraybuffer
 -   Remove all filesystem files when open
 -   Implement system to manage file upload to detect upload finalization
 -   Implement each device queue of file to be sent
@@ -74,7 +69,6 @@ Modelo "filial" qeek.me, para atingit global e sempre ter um server perto de voc
 -   Finish the signaling and sessions address holders
 -   Check if is necessary to change the way the websockets exchange info
 
--   When downloading file the file owner will view a bar for each downloading peer with the name of who is downloading with the name following the end of the bar, like a car race
 -   Advertises while loading
 
 -   In the app, will have a similar address bar but with "qeek.me/" fixed and you will be able to write folder name only
@@ -88,7 +82,7 @@ Modelo "filial" qeek.me, para atingit global e sempre ter um server perto de voc
 -   Create menu for about stuff, change name etc
 -   Implement better screen for the desktop site
 -   implement title to the menu icons (like message and get the file) of qeek(verify if this is really need)
--   In the final version don't show the status connecting, joinning, etc
+
 -   Must check whether the browser is chrome last version and firefox last version... if not, block initialization(maybe use this cause individual api detection works better)
 -   Implement system to limit download size in case no db system is not available due to it will be placed in the ram
 
@@ -98,7 +92,6 @@ Modelo "filial" qeek.me, para atingit global e sempre ter um server perto de voc
 -   Must implement mode to cancel on progress download or stop it to continue later
 -   Implement logic to avoid allowance of same file being downloaded in parallel (to be understood) maybe because filesystem crashs
 
--   Implement system in case private mode is used on fire fox(must verify if private on chrome affects the file system api) limit download size cause it will be store in the memory
 -   Check how to implement reconnection in case of connection lost (WILL BE MADE IN THE ABOVE IMPLEMENTATION)
 -   Must implement mode to disconnect from server (is need in some cases, must remember which ones)
 -   Advertise based on engineering stuff, calculating time and getting to the result that for small files, qeek me is your best option
