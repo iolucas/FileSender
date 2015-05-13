@@ -62,7 +62,7 @@ function LocalStorager() {
                 type: type,
                 //buffer: new Uint8ClampedArray(parseInt(size)),
                 buffer: [],
-                bufPointer: 0
+                bufLength: 0
             };
             
             if(callback)    //if a callback is signed
@@ -92,13 +92,12 @@ function LocalStorager() {
             });   
         } else {    //append the ARRAYBUFFER
             for(var i = 0 ; i < fileData.length ; i++) {
-                //files[id].buffer.set(new Uint8ClampedArray(fileData[i]), files[id].bufPointer);
                 files[id].buffer.push(fileData[i]);
-                files[id].bufPointer += fileData[i].byteLength;
+                files[id].bufLength += fileData[i].byteLength;
             }
             if(callback) //if a callback is passed,
                 //call it with the id and a flag whether this file is completed or not
-                callback(files[id].bufPointer >= files[id].size);
+                callback(files[id].bufLength >= files[id].size);
         }
     }
     
@@ -127,8 +126,10 @@ function LocalStorager() {
                 delete files[id];   //delete this file id index        
                 if(next) next(e);//call the callback with the error handler
             });
-        else {   //if ARRAYBUFFER, 
-            files[id].buffer = null;    //clear the buffer reference
+        else {   //if ARRAYBUFFER,
+            for(var j=0; j < files[id].buffer.length; j++)
+                delete files[id].buffer[j]; //delete all buffer references   
+            delete files[id].buffer;    //delete the buffer reference
             delete files[id];   //delete this file id index
             if(next) next();
         }
