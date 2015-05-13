@@ -158,7 +158,8 @@ function OnDataChannelConnection(id, dataChannel) {
 
         if(device.download) {
             device.download.setFileChunk(data); //if so, set the file chunk
-            device.icon.setDownloadProgress(device.download.getLen(), device.download.size);
+            if(device && device.download)
+                device.icon.setDownloadProgress(device.download.getLen(), device.download.size);
         }
         
     });
