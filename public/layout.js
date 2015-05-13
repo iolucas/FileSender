@@ -376,9 +376,7 @@ function ShowPopup(device, message, file, acceptLabel, refuseLabel, acceptCallba
     tRow0.appendChild(tData0);
     table.appendChild(tRow0);
     
-    /*table.innerHTML = "<tr><td><table class='popupWindow'><tr><td class='mainImgTd' style='height: 1px;'><img src='" + imgSrc + "' class='mainImg'></td><td class='deviceName'>" + device.name + "<br><span>" + device.origin + "</span></td></tr><tr><td colspan='2' style='height: 1px;'>" + message + "</td></tr><tr><td colspan='2' style='height: 1px;'>" + file.name + "<br>" + getSizeWord(file.size) + "</td></tr><tr><td colspan='2'><span id='refuse' class='popupButton'>" + refuseLabel + "</span><span id='accept' class='popupButton'>" + acceptLabel + "</span></td></tr></table></td></tr>";*/
-    
-    parent.style.overflow = "hidden";  //hiddes the navigation bar in case content is greater than the screen, bug in case more than one is opened   
+    /*table.innerHTML = "<tr><td><table class='popupWindow'><tr><td class='mainImgTd' style='height: 1px;'><img src='" + imgSrc + "' class='mainImg'></td><td class='deviceName'>" + device.name + "<br><span>" + device.origin + "</span></td></tr><tr><td colspan='2' style='height: 1px;'>" + message + "</td></tr><tr><td colspan='2' style='height: 1px;'>" + file.name + "<br>" + getSizeWord(file.size) + "</td></tr><tr><td colspan='2'><span id='refuse' class='popupButton'>" + refuseLabel + "</span><span id='accept' class='popupButton'>" + acceptLabel + "</span></td></tr></table></td></tr>";*/  
     
     acceptBut.addEventListener("click", function() {
         modalsQty--;
@@ -394,6 +392,86 @@ function ShowPopup(device, message, file, acceptLabel, refuseLabel, acceptCallba
         parent.removeChild(table);
         refuseCallback();  
     });
+    
+    parent.appendChild(table); 
+}
+
+function ShowTerms(){   
+    
+    var parent = document.getElementById("screen");
+    var table = document.createElement("table");
+    table.setAttribute("class", "fullscreen");    
+    
+    var tRow0 = document.createElement("tr"),
+        tData0 = document.createElement("td"),
+    
+        frame = document.createElement("iframe");
+    
+    frame.src = "terms.html";
+    frame.setAttribute("class", "terms");
+    
+    var popup = document.createElement("table");
+    popup.setAttribute("class", "popupWindow");
+    popup.style.textAlign = "right";
+    popup.style.padding = 0;
+    
+    var closeBut = document.createElement("span");
+    closeBut.setAttribute("id", "termsClose");
+    closeBut.innerHTML = "X";
+    closeBut.addEventListener("click", function() {
+        parent.removeChild(table);              
+    });
+    
+    popup.appendChild(closeBut);
+    popup.appendChild(frame);
+ 
+    tData0.appendChild(popup);
+    tRow0.appendChild(tData0);
+    table.appendChild(tRow0);  
+    
+    parent.appendChild(table); 
+}
+
+function ShowAbout(){   
+    
+    modalsQty++;    //increase the modalsQty variable
+    DisableScreen();
+    
+    var parent = document.getElementById("screen");
+    var table = document.createElement("table");
+    table.setAttribute("class", "fullscreen");    
+    
+    var tRow0 = document.createElement("tr"),
+        tData0 = document.createElement("td"),
+    
+        frame = document.createElement("iframe");
+    
+    frame.src = "about.html";
+    frame.setAttribute("class", "terms");
+    
+    var popup = document.createElement("table");
+    popup.setAttribute("class", "popupWindow");
+    popup.style.textAlign = "right";
+    popup.style.padding = 0;
+    popup.style.backgroundColor = "#111";
+    
+    var closeBut = document.createElement("span");
+    closeBut.setAttribute("id", "termsClose");
+    closeBut.innerHTML = "X";
+    closeBut.style.color = "#fff";
+    closeBut.addEventListener("click", function() {      
+        modalsQty--;
+        if(modalsQty <= 0)
+            EnableScreen();
+        parent.removeChild(table);
+    });
+    
+    popup.appendChild(closeBut);
+    popup.appendChild(frame);
+ 
+    tData0.appendChild(popup);
+    tRow0.appendChild(tData0);
+    table.appendChild(tRow0);  
     
     parent.appendChild(table); 
 }
