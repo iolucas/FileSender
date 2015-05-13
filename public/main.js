@@ -27,6 +27,10 @@ window.onload = function() {
     else {    //if not,
         DisableScreen();    //dark the default screen
         document.getElementById("welcome").style.display = "table";  //display the screen to insert a username
+        document.getElementById("termsBut").addEventListener("click", function(e) {
+            e.preventDefault();
+            ShowTerms();            
+        });
     }
 };
              
@@ -36,7 +40,7 @@ function setUserAndStart() {
     var textValue = document.getElementById("userInput").value; //get the typed text               
     if(textValue == "") //if it is empty, return
         return;              
-    setCookie("username", textValue, 1);    //set username cookie with the textvalue                  
+    setCookie("username", textValue, 0);    //set username cookie with the textvalue                  
     username = textValue;   //set the username with the textvalue              
     document.getElementById("welcome").style.display = "none";  //hide welcome screen
     EnableScreen(); //put the screen clear again
@@ -48,7 +52,7 @@ function setUserAndStart() {
 //--------------  MAIN FUNCTION TO BE EXECUTED TO START EVERYTHING  --------------//
 
 function main() {
-    
+    setCookie("username", username, 0); 
     //Set user info in the top of the screen
     SetLocalUser(username, sessionAddr, deviceType);
     
@@ -214,7 +218,6 @@ function OnDataChannelConnection(id, dataChannel) {
             };
             
             device.download.onDownloadComplete = function() { 
-                //device.CancelDownload(false);
                 device.icon.hideDownload();
                 device.download = null;
                 ShowTempMessage("Download Completo.", 3000);
