@@ -39,6 +39,21 @@ body {
     text-align: center;  
 }
 
+.terms {
+    height: calc(100% - 28px);
+    width: 100%;
+    border: 0; 
+}
+
+#termsClose {
+    position: relative;
+    font-size: 20px;
+    text-align: right;
+    top: -3px;
+    right: 3px;
+    cursor: pointer;
+}
+
 /*.screenDisabled {
     position: absolute;
     top:0;
@@ -132,6 +147,7 @@ header {
     height: 60px;
     padding: 0 10px 0 20px;
     font-size: 20px;
+    cursor: pointer;
 }
 
 
@@ -234,6 +250,7 @@ header {
     box-sizing: border-box;
     font-size: 16px;
     color: #000;
+    position: relative;
 }
 
 input[type=checkbox] {
