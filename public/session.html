@@ -25,10 +25,10 @@
         <div id="screen" class="fullscreen">
             <table id="welcome" class="fullscreen" style="display:none;">
                 <tr><td>
-                    <div class="popupWindow">          
+                    <div class="popupWindow">
                         Bem vindo! <br><br>Insira seu nome para ser identificado por outros dispositivos:<br>
                         <input id="userInput" type="text" maxlength="20" placeholder="Ex.: Lucas-PC, Junior-Cel"><br>
-                        <input id="terms" type="checkbox"> Aceito os <a href="#">Termos de Uso</a><br>
+                        <input id="terms" type="checkbox"> Aceito os <a id="termsBut" href="#">Termos de Uso</a><br>
                         <div class="popupButton" onclick="setUserAndStart();">OK</div>
                     </div>
                 </td></tr>        
@@ -40,7 +40,7 @@
         <section id="section">
             <table id="menu">
 <!--            <tr><td>Configuração</td></tr> -->
-                <tr><td>Sobre</td></tr>        
+                <tr><td onclick="ShowAbout();">Sobre</td></tr>        
             </table>
         </section>
         
@@ -48,11 +48,12 @@
         <script src="layout.js"></script>
         <script src="smartc.js"></script>
         <script src="fileManager.js"></script>
+        <script src="idb.filesystem.js"></script>
+        <script src="LocalStorager.js"></script>
         <script src="downloadManager.js"></script>
-        <script src="idb.filesystem.min.js"></script>
         <script src="misc.js"></script>
         <script src="main.js"></script>      
-        <script>
+        <script>           
             var localIp;
             function getIP(json) { localIp = json.ip; }
         </script>
