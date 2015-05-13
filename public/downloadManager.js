@@ -216,8 +216,8 @@ function DownloadFile(fileId, fileName, fileSize, fileType) {
                 fileWriter.onwriteend = function() {   //to be executed once the write event finishes                   
                     if(fileWriter.length >= self.size) {    //verify if all the expected data has been received  
                                          
-                        log(fileEntry);
-                        log(fileEntry.file);
+                        //log(fileEntry);
+                        //log(fileEntry.file);
                         if(isFirefox)
                             fileEntry.file(function(newFile){
                                 saveBlobLocally(newFile, self.name);  //create new blob with the fileEntry with the file name
