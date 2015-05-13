@@ -24,8 +24,10 @@ window.onload = function() {
     username = getCookie("username");   //Get username cookie, if not, request one               
     if(username != "")  //if it does exists, 
         main();   //starts the application with the username speficified, session and deviceType
-    else    //if not,
+    else {    //if not,
+        DisableScreen();    //dark the default screen
         document.getElementById("welcome").style.display = "table";  //display the screen to insert a username
+    }
 };
              
 function setUserAndStart() {              
@@ -36,7 +38,8 @@ function setUserAndStart() {
         return;              
     setCookie("username", textValue, 1);    //set username cookie with the textvalue                  
     username = textValue;   //set the username with the textvalue              
-    document.getElementById("welcome").style.display = "none";  //hide welcome screen               
+    document.getElementById("welcome").style.display = "none";  //hide welcome screen
+    EnableScreen(); //put the screen clear again
     main();   //starts the application with the username speficified, session and deviceType
 }   
 
