@@ -279,33 +279,123 @@ function SetLocalUser(localName, sessionName, deviceType) {
     document.getElementById("user").style.display = "table";
 }
 
+var modalsQty = 0;
+
+function DisableScreen() {
+    document.getElementById("screen").style.display = "block";
+    document.body.style.overflow = "hidden";
+}
+
+function EnableScreen() {
+    document.getElementById("screen").style.display = "none";
+    document.body.style.overflow = "visible";
+}
+
 function ShowPopup(device, message, file, acceptLabel, refuseLabel, acceptCallback, refuseCallback){   
     
     //var deviceOrigin = device.devOrigin == "local" ? "Dispositivo Local" : "Dispositivo de Sessão";
-    
-    var parent = document.body;
+    modalsQty++;    //increase the modalsQty variable
+    DisableScreen();
+    var parent = document.getElementById("screen");
     var table = document.createElement("table");
-    table.setAttribute("class", "screenDisabled");    
+    table.setAttribute("class", "fullscreen");    
     var imgSrc = "";   
     if(device.type == "mobile")
         imgSrc = "img/mob.png";
     else if(device.type == "tablet")
         imgSrc = "img/tab.png";
     else
-        imgSrc = "img/comp.png";    
-    table.innerHTML = "<tr><td><table class='popupWindow'><tr><td class='mainImgTd' style='height: 1px;'><img src='" + imgSrc + "' class='mainImg'></td><td class='deviceName'>" + device.name + "<br><span>" + device.origin + "</span></td></tr><tr><td colspan='2' style='height: 1px;'>" + message + "</td></tr><tr><td colspan='2' style='height: 1px;'>" + file.name + "<br>" + getSizeWord(file.size) + "</td></tr><tr><td colspan='2'><span id='refuse' class='popupButton'>" + refuseLabel + "</span><span id='accept' class='popupButton'>" + acceptLabel + "</span></td></tr></table></td></tr>";   
+        imgSrc = "img/comp.png";
+    
+    
+    var tRow0 = document.createElement("tr"),
+        tData0 = document.createElement("td");
+    
+    var popup = document.createElement("table");
+    popup.setAttribute("class", "popupWindow");
+    
+    var tRow1 = document.createElement("tr");
+    
+    var tData1 = document.createElement("td");
+    tData1.setAttribute("class", "mainImgTd");
+    tData1.style.height = "1px";
+    
+    var img = document.createElement("img");
+    img.src = imgSrc;
+    img.setAttribute("class", "mainImg");
+    
+    var tData2 = document.createElement("td");
+    tData2.setAttribute("class", "deviceName");
+    tData2.innerHTML = device.name + "<br><span>" + device.origin + "</span>";
+    
+    var tRow2 = document.createElement("tr");
+    
+    var tData3 = document.createElement("td");
+    tData3.setAttribute("colspan", "2");
+    tData3.style.height = "1px";
+    tData3.innerHTML = message;
+    
+    var tRow3 = document.createElement("tr");
+        
+    var tData4 = document.createElement("td");
+    tData4.setAttribute("colspan", "2");
+    tData4.style.height = "1px";
+    tData4.innerHTML = file.name + "<br>" + getSizeWord(file.size);
+    
+    var tRow4 = document.createElement("tr");
+    
+    var tData5 = document.createElement("td");
+    tData5.setAttribute("colspan", "2");
+
+    var refuseBut = document.createElement("span");
+    refuseBut.setAttribute("class", "popupButton");
+    refuseBut.innerHTML = refuseLabel;
+    
+    var acceptBut = document.createElement("span");
+    acceptBut.setAttribute("class", "popupButton");
+    acceptBut.innerHTML = acceptLabel;
+    
+    tData5.appendChild(refuseBut);
+    tData5.appendChild(acceptBut);
+    
+    tRow4.appendChild(tData5);
+    tRow3.appendChild(tData4);
+    tRow2.appendChild(tData3);
+    
+    tData1.appendChild(img);
+    
+    tRow1.appendChild(tData1);
+    tRow1.appendChild(tData2);
+    
+    popup.appendChild(tRow1);
+    popup.appendChild(tRow2);
+    popup.appendChild(tRow3);
+    popup.appendChild(tRow4);
+    
+    tData0.appendChild(popup);
+    tRow0.appendChild(tData0);
+    table.appendChild(tRow0);
+    
+    /*table.innerHTML = "<tr><td><table class='popupWindow'><tr><td class='mainImgTd' style='height: 1px;'><img src='" + imgSrc + "' class='mainImg'></td><td class='deviceName'>" + device.name + "<br><span>" + device.origin + "</span></td></tr><tr><td colspan='2' style='height: 1px;'>" + message + "</td></tr><tr><td colspan='2' style='height: 1px;'>" + file.name + "<br>" + getSizeWord(file.size) + "</td></tr><tr><td colspan='2'><span id='refuse' class='popupButton'>" + refuseLabel + "</span><span id='accept' class='popupButton'>" + acceptLabel + "</span></td></tr></table></td></tr>";*/
+    
     parent.style.overflow = "hidden";  //hiddes the navigation bar in case content is greater than the screen, bug in case more than one is opened   
-    parent.appendChild(table); 
-    document.getElementById("accept").addEventListener("click", function() {           
+    
+    acceptBut.addEventListener("click", function() {
+        modalsQty--;
+        if(modalsQty <= 0)
+            EnableScreen();
         parent.removeChild(table);
-        parent.style.overflow = "visible";
         acceptCallback();  
     });   
-    document.getElementById("refuse").addEventListener("click", function() {    
+    refuseBut.addEventListener("click", function() {
+        modalsQty--;
+        if(modalsQty <= 0)
+            EnableScreen();
         parent.removeChild(table);
-        parent.style.overflow = "visible";
         refuseCallback();  
     });
+    
+    parent.appendChild(table); 
 }
 
 function getSizeWord(size) {    
