@@ -25,7 +25,6 @@ function DownloadFile(fileId, fileName, fileSize, fileType) {
     var chunksToBeReceived = 0; //var to store the chunks left until the next request
     
     localStorager.NewFile(fileId,fileName,fileSize, fileType, function() {
-        log("New file created");
         downReady = true;
     });
 
@@ -110,6 +109,8 @@ function DownloadFile(fileId, fileName, fileSize, fileType) {
                         localStorager.DeleteFile(self.id);      
                     }, 30000);
                         
+                    buffer = null;  //clear buffer accumulator
+                    
                     if(self.onDownloadComplete) //if the download complete event has been signed,
                         self.onDownloadComplete(self.id);   //fire it
                         
