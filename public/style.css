@@ -24,6 +24,32 @@ body {
     user-select: none;   
 }
 
+#screen {
+    background-color: rgba(0,0,0,.8);
+    display: none;
+}
+
+.fullscreen {
+    position: absolute;
+    top:0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+    text-align: center;  
+}
+
+/*.screenDisabled {
+    position: absolute;
+    top:0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0,0,0,.8);
+    z-index: 10;
+    text-align: center;
+}*/
+
 #message {
     line-height: 30px;    
     background-color: darkblue;
@@ -197,17 +223,6 @@ header {
 }
 
 /*  Popup Style */
-
-.screenDisabled {
-    position: absolute;
-    top:0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background-color: rgba(0,0,0,.8);
-    z-index: 10;
-    text-align: center;
-}
 
 .popupWindow {
     height: 250px;
