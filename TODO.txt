@@ -60,7 +60,7 @@ Modelo "filial" qeek.me, para atingit global e sempre ter um server perto de voc
 -   Must verify enhancements in the rtc connections
 --------------
 
-
+-   create filesystem wrapper or use filer
 -   Remove all filesystem files when open
 -   Implement system to manage file upload to detect upload finalization
 -   Implement each device queue of file to be sent
