@@ -5,7 +5,7 @@ var cfenv = require("cfenv"),   //get cloud foundry enviroment module
     http  = require("http"),    //get http module
     ws = require("ws"), //get the websocket module
     express = require("express"),   //get express module
-    Wocket = require("./public/Wocket"),  //Import MaestroSocket class from MaestroSocket.js
+    Wocket = require("./Wocket"),  //Import MaestroSocket class from MaestroSocket.js
     IdManager = require("./IdManager"), //get IdManager module
     Misc = require("./MiscFunctions"),  //Import MiscFunctions class from MiscFunctions.js 
 
@@ -20,10 +20,10 @@ var cfenv = require("cfenv"),   //get cloud foundry enviroment module
 //------------------------------------------------------------------------------------//
 
 //SERVE HTTP FILES IN PUBLIC FOLDERS
-app.use(express.static("public"));  
+//app.use(express.static("public"));  
     
 //CREATE NEW SESSION AND RESPOND GET/ WITH THE SESSION CREATED
-app.get("/", function(req, res) {
+/*app.get("/", function(req, res) {
     var newSession = createSession();
     //timeout in case no one connects to it until one minute, it will be cleared
     setTimeout(function() { 
@@ -35,10 +35,10 @@ app.get("/", function(req, res) {
     log("New session created: " + newSession);    
     //res.redirect("https://b.qeek.me/" + newSession);
     res.redirect(newSession);
-});
+});*/
 
 //CHECK IF THE REQUESTED GET/* PATH EXISTS, IF SO, RETURN INDEX, IF NOT, RETURN ERROR     
-app.get("/*", function(req, res) {  
+/*app.get("/*", function(req, res) {  
     //CHECK REQUESTED GET/*
     if(req.path == "/about")
         res.sendFile(__dirname + "/public/about.html");
@@ -58,7 +58,15 @@ app.get("/*", function(req, res) {
         res.sendFile(__dirname + "/public/session.html");
     else    //if any dot is found, 
         res.end();  //finish the response
+});*/
+
+app.get("/getSystemStatus", function(req, res) {  
+    var statusWord = "<html>Status:<br>Sessions: " + Misc.LengthOf(sessions);
+    for(s in sessions)
+        statusWord += "<br><br>" + s; 
+    res.send(statusWord);
 });
+
 
 //-----------------------------------------------
 
@@ -72,6 +80,20 @@ wsServer.on("connection", function(sock) {
     
     wSocket.on("error", function() {
         log("Websocket error.");    
+    });
+    
+    wSocket.on("createSession", function() {
+        var newSession = createSession();
+        //timeout in case no one connects to it until one minute, it will be cleared
+        setTimeout(function() { 
+            if(Misc.LengthOf(sessions[newSession]) <= 0) {
+                log("Deleting abandoned session.");
+                delete sessions[newSession]; 
+            } 
+        }, 60000);
+        log("New session created: " + newSession);    
+        //res.redirect("https://b.qeek.me/" + newSession);
+        wSocket.emit("sessionCreated", newSession);  
     });
     
     wSocket.on("joinSession", function(connIpv4, sessionAddr, username, deviceType) {
