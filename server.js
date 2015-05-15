@@ -62,9 +62,9 @@ var cfenv = require("cfenv"),   //get cloud foundry enviroment module
 
 app.get("/getSystemStatus", function(req, res) {  
     var statusWord = "<html>Status:<br>Sessions: " + Misc.LengthOf(sessions);
-    for(s in sessions)
+    /*for(s in sessions)
         statusWord += "<br><br>" + s; 
-    res.send(statusWord);
+    res.send(statusWord);*/
 });
 
 
@@ -77,6 +77,18 @@ wsServer.on("connection", function(sock) {
     log("New connection.");
     
     wSocket = new Wocket(sock);
+    
+    var isAliveTimer = setInterval(function() { //set interval to periodic sent isAlive packets
+        wSocket.emit("isAlive");
+        wSocket.timerToClose = setTimeout(function() {   //set timeout of 1 minute for the connection respond the isAlive msg
+            clearInterval(isAliveTimer);    //stop the check isAliveTimer
+            wSocket.close();    //close the connection if no response    
+        }, 60000);
+    }, 70000);
+    
+    wSocket.on("ImAlive", function() {
+        clearTimeout(wSocket.timerToClose);  //clear the close timeout   
+    });
     
     wSocket.on("error", function() {
         log("Websocket error.");    
