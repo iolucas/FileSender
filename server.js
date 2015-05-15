@@ -63,8 +63,8 @@ var cfenv = require("cfenv"),   //get cloud foundry enviroment module
 app.get("/getSystemStatus", function(req, res) {  
     var statusWord = "<html>Status:<br>Sessions: " + Misc.LengthOf(sessions);
     /*for(s in sessions)
-        statusWord += "<br><br>" + s; 
-    res.send(statusWord);*/
+        statusWord += "<br><br>" + s; */
+    res.send(statusWord);
 });
 
 
