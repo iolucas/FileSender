@@ -5,7 +5,7 @@
 #--------------------------------------
 
 applications:
-- name:    ach2
-  host:    ach2  
+- name:    qeekmeserver2
+  host:    qeekmeserver2  
   memory:  256M
   command: node server.js
