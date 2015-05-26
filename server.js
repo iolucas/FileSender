@@ -77,7 +77,7 @@ wsServer.on("connection", function(sock) {
     log("New connection.");
     
     wSocket = new Wocket(sock);
-    
+    /*
     var isAliveTimer = setInterval(function() { //set interval to periodic sent isAlive packets
         wSocket.emit("isAlive");
         wSocket.timerToClose = setTimeout(function() {   //set timeout of 1 minute for the connection respond the isAlive msg
@@ -88,7 +88,7 @@ wsServer.on("connection", function(sock) {
     
     wSocket.on("ImAlive", function() {
         clearTimeout(wSocket.timerToClose);  //clear the close timeout   
-    });
+    });*/
     
     wSocket.on("error", function() {
         log("Websocket error.");    
