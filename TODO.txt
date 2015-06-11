@@ -1,5 +1,10 @@
 A lot of problems due to server crash might be solved with the client itself that will try to reconnect again, on going transfer will not be prejudice by a server crash
 
+-add way to register ip address to temp block too much requests and limit one createSession request per connection and limit invalid requests attempts closing the connection and adding penalty to the ip
+-add try catch to wocket due to error that crashs the server in case of bad json format
+-add timeout to clear websocket connection that does not request anything
+
+
 CANT GO WITHOUT:
 
 -   Follow and participate bluemix, nodejs and webrtc events to talk about qeekme
