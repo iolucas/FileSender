@@ -126,6 +126,14 @@ function Wocket(wSocket) {
     }
 
     function getDataObj(dataStr) {
-        return JSON.parse(dataStr);
+        var dataObj;
+        //added block try in case invalid json arrives
+        try {
+            dataObj = JSON.parse(dataStr);   
+        } catch(ex) {
+            dataObj = new Object();            
+        } finally {
+            return dataObj;    
+        }
     }
 }
