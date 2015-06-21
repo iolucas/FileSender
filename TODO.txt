@@ -3,6 +3,7 @@ A lot of problems due to server crash might be solved with the client itself tha
 -add way to register ip address to temp block too much requests and limit one createSession request per connection and limit invalid requests attempts closing the connection and adding penalty to the ip
 -add try catch to wocket due to error that crashs the server in case of bad json format
 -add timeout to clear websocket connection that does not request anything
+-add server verification if some session is already joined for a socket connection do not allow others
 
 
 CANT GO WITHOUT:
@@ -32,6 +33,7 @@ GENERAL TODO:
 
 SERVER TODO:
 
+-   add cross origin connection if it is applicable
 -   Use english and portugueses words as address
 -   Create turn servers with different bluemix accounts
 -   Periodic send isAlive data because bluemix is stucking connections up
