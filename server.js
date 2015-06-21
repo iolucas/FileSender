@@ -76,7 +76,7 @@ wsServer.on("connection", function(sock) {
     
     log("New connection.");
     
-    wSocket = new Wocket(sock);
+    var wSocket = new Wocket(sock);
     /*
     var isAliveTimer = setInterval(function() { //set interval to periodic sent isAlive packets
         wSocket.emit("isAlive");
