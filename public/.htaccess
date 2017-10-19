@@ -1,0 +1,21 @@
+RewriteEngine On    # Turn on the rewriting engine
+
+#RewriteCond %{HTTP:Accept-Language} (pt-BR) [NC]
+#RewriteRule .* %{HTTP:Accept-Language} [R,L]
+
+RewriteCond %{SERVER_PORT} 443
+RewriteCond %{HTTP_HOST} ^www\.qeek\.me$
+RewriteRule ^([A-Za-z0-9-]+)/?$ https://qeek.me/$1 [R=301,L]
+
+RewriteCond %{SERVER_PORT} !=443
+RewriteCond %{HTTP_HOST} ^(www\.)?qeek\.me$
+RewriteRule ^([A-Za-z0-9-]+)/?$ https://qeek.me/$1 [R=301,L]
+
+RewriteRule ^([A-Za-z0-9-]+)/?$    session.php?s=$1   [L]    # Handle requests for "qeek.me"
+
+
+#IF REQUEST PORT IS NOT 443 (HTTPS)
+#AND (AND IS MAKE WITH NO FLAGS) IS A REQUEST TO WWW.QEEK.ME OR QEEK.ME
+#REDIRECT TO HTTPS://QEEK.ME/"SESSION"
+
+#HANDLE SESSION ADDRESS SHORT PASSING IT TO THE PHP PAGE AS ?s="SESSION"
