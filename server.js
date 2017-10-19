@@ -20,10 +20,10 @@ var cfenv = require("cfenv"),   //get cloud foundry enviroment module
 //------------------------------------------------------------------------------------//
 
 //SERVE HTTP FILES IN PUBLIC FOLDERS
-//app.use(express.static("public"));  
+app.use(express.static("public"));  
     
 //CREATE NEW SESSION AND RESPOND GET/ WITH THE SESSION CREATED
-/*app.get("/", function(req, res) {
+app.get("/", function(req, res) {
     var newSession = createSession();
     //timeout in case no one connects to it until one minute, it will be cleared
     setTimeout(function() { 
@@ -35,10 +35,10 @@ var cfenv = require("cfenv"),   //get cloud foundry enviroment module
     log("New session created: " + newSession);    
     //res.redirect("https://b.qeek.me/" + newSession);
     res.redirect(newSession);
-});*/
+});
 
 //CHECK IF THE REQUESTED GET/* PATH EXISTS, IF SO, RETURN INDEX, IF NOT, RETURN ERROR     
-/*app.get("/*", function(req, res) {  
+app.get("/*", function(req, res) {  
     //CHECK REQUESTED GET/*
     if(req.path == "/about")
         res.sendFile(__dirname + "/public/about.html");
@@ -47,8 +47,8 @@ var cfenv = require("cfenv"),   //get cloud foundry enviroment module
     else if(req.path == "/getSystemStatus") {
         var statusWord = "<html>Status:<br>Sessions: " + Misc.LengthOf(sessions);
 
-        for(s in sessions)
-           statusWord += "<br><br>" + s; 
+//        for(s in sessions)
+//           statusWord += "<br><br>" + s; 
         res.send(statusWord);
         //res.send("<html>Status:<br>Sessions: " + Misc.LengthOf(sessions));
     }
@@ -58,14 +58,14 @@ var cfenv = require("cfenv"),   //get cloud foundry enviroment module
         res.sendFile(__dirname + "/public/session.html");
     else    //if any dot is found, 
         res.end();  //finish the response
-});*/
-
-app.get("/getSystemStatus", function(req, res) {  
-    var statusWord = "<html>Status:<br>Sessions: " + Misc.LengthOf(sessions);
-    /*for(s in sessions)
-        statusWord += "<br><br>" + s; */
-    res.send(statusWord);
 });
+
+//app.get("/getSystemStatus", function(req, res) {  
+//    var statusWord = "<html>Status:<br>Sessions: " + Misc.LengthOf(sessions);
+//    /*for(s in sessions)
+//        statusWord += "<br><br>" + s; */
+//    res.send(statusWord);
+//});
 
 
 //-----------------------------------------------

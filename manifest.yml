@@ -5,7 +5,7 @@
 #--------------------------------------
 
 applications:
-- name:    qeekmeserver2
-  host:    qeekmeserver2  
-  memory:  256M
+- name:    fsender
+  host:    fsender  
+  memory:  128M
   command: node server.js

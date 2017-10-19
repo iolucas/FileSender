@@ -5,14 +5,16 @@ function IdManager() {
     var fs = require("fs");
     var Misc = require("./MiscFunctions");
     
-    var wordList = [];
-    var input = fs.createReadStream("words.txt");
+    //var wordList = [];
+    //var input = fs.createReadStream("words.txt");
     
-    readLines(input, function (data) {
-        wordList.push(data);
-    });
+//    readLines(input, function (data) {
+//        wordList.push(data);
+//    });
  
     this.getWordId = function() {
+        return Misc.GetAlphaNumId(7);
+        
         if(wordList.length == 0)
             return null;
     
@@ -24,7 +26,7 @@ function IdManager() {
         var numberId = Misc.GetNumId(3);
     
         var wIndex = (Math.random() * wordList.length).toFixed(0);  //got to fix 0 decimal places to use an index
-        var wordId = wordList[wIndex];  
+        var wordId = wordList[wIndex]; 
     
         wordId = wordId.substr(0,wordId.length-1);
     

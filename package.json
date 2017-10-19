@@ -5,9 +5,9 @@
   "author": "Lucas V. Oliveira",
   "version": "0.2.0",
   "dependencies": {
-    "ws": "0.7.1",
-    "cfenv": "1.0.x",
-    "express": "4.12.3"
+    "cfenv": "^1.0.4",
+    "express": "^4.12.3",
+    "ws": "^0.7.1"
   },
   "scripts": {
     "start": "node server.js"
