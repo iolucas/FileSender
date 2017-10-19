@@ -43,7 +43,4 @@ Temporary Items
 .apdisk
 
 /node_modules
-/public/img
-/public/favicon.ico
-words.txt
 *.url
