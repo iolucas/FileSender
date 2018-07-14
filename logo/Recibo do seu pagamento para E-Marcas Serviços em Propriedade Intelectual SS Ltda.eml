@@ -1,0 +1,396 @@
+x-store-info:bACznEDmg4zfERrEOKhrT7sO1oFMHruJ6dCMNwiHfPhLbk9kcuMwzeAOOkrrivrEboWlE6vZYoac5ik0+SyKkk37+n8GSJj5Rah3CZhZSpJKKoFuAgP8IGKM9rcF0AOEtHTEV6grli0=
+Authentication-Results: hotmail.com; spf=pass (sender IP is 173.0.84.226; identity alignment result is pass and alignment mode is relaxed) smtp.mailfrom=service@paypal.com.br; dkim=pass (identity alignment result is pass and alignment mode is relaxed) header.d=paypal.com.br; x-hmca=pass header.id=service@paypal.com.br
+X-SID-PRA: service@paypal.com.br
+X-AUTH-Result: PASS
+X-SID-Result: PASS
+X-Message-Status: n:n
+X-Message-Delivery: Vj0xLjE7dXM9MDtsPTE7YT0xO0Q9MTtHRD0xO1NDTD0w
+X-Message-Info: NhFq/7gR1vQRHV6jbdvQfsKUeeVAoUVojAJS6DKEC2HL3MEJcsjQ06IjcqT2F31xiBVE+OQynh/Ud5lnggjAcVSfNH2IuW6oaKKDq3JrX68Se+bWzFh/RiQtEwldux9XuZwJiKcwD2YZZTOkn3RvRsbOs0X8NpPcuKyE7vpbCeszy4ovsbhz7Ox4HUeNtSHhg3ODk1qe1SQ2sAvvH45NWp1JZG01yS5W
+Received: from mx0.slc.paypal.com ([173.0.84.226]) by SNT004-MC4F22.hotmail.com over TLS secured channel with Microsoft SMTPSVC(7.5.7601.23008);
+	 Fri, 24 Apr 2015 13:22:13 -0700
+DKIM-Signature: v=1; a=rsa-sha256; d=paypal.com.br; s=pp-dkim1; c=relaxed/relaxed;
+	q=dns/txt; i=@paypal.com.br; t=1429905732;
+	h=From:From:Subject:Date:To:MIME-Version:Content-Type;
+	bh=lINSvQXjuqOwXi8/cy3rFQnTxnuVdsBb6iA1SG8GT30=;
+	b=s7Dbugjh8mDn1bbuvDvIOEe7e2BLRprkQGNRs7Ws+9vTG8lD+MlacUxvcbIaWdPj
+	2unoBZnbBZgyFs1hvNaoN5dCRlYZ3ktytzZuBboIa4E2ERpKZTYO9JOfer4b05yY
+	wQsQJAIJ4i/YhQw8Q4RLNlznozUyL5jkgj3MA1uLURUcZPnbYq5o/PlEhRw4Ii8f
+	0haz92H5TAxN/Wk8SCvhYUJr5in6jd6FSTWkqFVwV19liRZ7u/m7ktD/V9Vzx39/
+	BYbPUeX3jW56F/uO6QJYHL518jkmlsxH9BGJgiXafgvtoRJ4dgvIuO6HaeOUL3L+
+	QeO23TacyntmOXNPdge9jg==;
+Received: (qmail 9386 invoked by uid 993); 24 Apr 2015 20:02:12 -0000
+Date: Fri, 24 Apr 2015 13:02:12 -0700
+Message-Id: <1429905732.9386@paypal.com>
+PP-Correlation-Id: 7d789ca68f047
+Subject: =?windows-1252?Q?Recibo_do_seu_pagamento_para_E-Marcas_Servi=E7os_em?=
+ =?windows-1252?Q?_Propriedade_Intelectual_SS_Ltda?=
+X-MaxCode-Template: email-receipt-xclick-payment
+To: Lucas Vieira de Oliveira <lucas.o@live.com>
+From: "service@paypal.com.br" <service@paypal.com.br>
+X-Email-Type-Id: PP120 - 7d789ca68f047
+X-XPT-XSL-Name: email_pimp/default/pt_BR/xclick/ReceiptXClickPayment.xsl
+Content-Type: multipart/alternative;
+ boundary=--NextPart_048F8BC8A2197DE2036A
+MIME-Version: 1.0
+Return-Path: service@paypal.com.br
+X-OriginalArrivalTime: 24 Apr 2015 20:22:13.0429 (UTC) FILETIME=[59887E50:01D07ECC]
+
+----NextPart_048F8BC8A2197DE2036A
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=windows-1252
+
+24 ABR 2015 17:01:08 BRT =7C ID da transa=E7=E3o: 8GN9834709005452A
+
+Ol=E1, Lucas Vieira de Oliveira,
+
+Voc=EA enviou um pagamento no valor de R=249,90 para E-Marcas Servi=E7os =
+em Propriedade Intelectual SS Ltda
+ (info=40e-marcas.com.br)=20
+
+
+Pode levar alguns segundos para que esta transa=E7=E3o apare=E7a na sua =
+conta.
+
+----------------------------------------------------------------
+
+Vendedor:
+E-Marcas Servi=E7os em Propriedade Intelectual SS Ltda
+info=40e-marcas.com.br
++55 1135223020
+
+Endere=E7o de entrega:
+Lucas Vieira de Oliveira
+Rua Jos=E9 Rafaeli  506  Apto 64 BL 4
+Socorro
+S=E3o Paulo  - SP
+04763-280
+Brasil
+
+Instru=E7=F5es para o vendedor
+Voc=EA n=E3o inseriu nenhuma instru=E7=E3o
+
+Detalhes da entrega:
+O vendedor ainda n=E3o forneceu detalhes da entrega.
+
+
+-----------------------------------
+Detalhes da compra
+-----------------------------------
+<a =
+href=3Dhttps://www.paypal.com/webapps/mch/cmd/?v=3D3.0&t=3D1429905731&fdata=
+=3DJA0MW3IEWlVPRltJGExVX1xhcVlwaF5kFSAtUmt-XFtbUXBofl0hMUlVYw5iWnxAPhIBAn4F=
+W1BKQlpWXRkEDlNtfVp1YFhkBjkgC2QYOlhfV2E7MFN1Bi00AX0cSA4rEC0kQCBWHVtIVggeSRE=
+ZV19helpzZVlwRnl5X2luCQgEA3pqawV4Y1ITJVQ4DHZeYldOEH4EQ1ZfHQYESgcIGwcxdA8hYV=
+skR38sXm0rWghZXiU8aFR.N00DYF40Wn1RYFdcQC5cGQELFQsZSUgIDl5gL1tzNF92FXkoW2AqD=
+lkLUCVhPAcuMEZRYgliXG0FMwgFDycKX1BBRl5DFENLHgknIA54Yl91QHlvDCovAw1QVHZhbQFu=
+NBcTPFxsWG0HMhAGEy4KXUANFxlNRQEZGktmCE93F0twMCglGz8pGARDCiI8MVM4OREfe1s-BW5=
+UFwUMQ3FxDg1cQitCGkJfX0NneFt8Y1pvRH1-WmxlXExeISwvfQEMMR0GMVkiBSoDIgEFBypbHw=
+MaFQQAWVBfXAMlOw9gYioqAj05HHx6X1osQnUefQAOIgMQe0gwETsHPUkKFCJEBApXEwIdAxcfT=
+1wTLQMkNQ8xGygsHHx6LAoMFCIxKlM&cks=3DMjU0NDVkN2Q2ODEzNTBkOTdhNDUzNThlZGY1ZD=
+Y1MDE&e=3D1.0><img =
+src=3D'https://www.paypalobjects.com/webstatic/MarketingOperations/LATAM/LA=
+TAM2015/BR/imgBR_201504_LATAM02856_MothersDay_530x80.jpg' border=3D'0' =
+alt=3D'Descubra o presente ideal para sua m=E3e. Pague com PayPal e ganhe =
+at=E9 30% de desconto.' dir=3D'ltr'/></a>
+Descri=E7=E3o:=20
+Pre=E7o unit=E1rio: R=249,90
+Qtd: 1
+Valor: R=249,90
+
+
+Subtotal: R=249,90
+
+Total: R=249,90
+
+Pagamento: R=249,90
+Esta cobran=E7a aparecer=E1 no extrato do seu cart=E3o como =22PAYPAL =
+*E-MARCAS=22
+Pagamento enviado a: info=40e-marcas.com.br
+
+
+
+----------------------------------------------------------------
+
+Problemas com esta transa=E7=E3o?
+Voc=EA tem 45 dias a contar da data da transa=E7=E3o para abrir uma =
+disputa na Central de solu=E7=F5es.
+
+D=FAvidas? Visite a Central de ajuda em: www.paypal.com/br/help.
+
+
+
+N=E3o responda a esta mensagem. Este e-mail foi enviado por um sistema =
+automatizado que n=E3o processa respostas. Para obter ajuda, acesse sua =
+conta do PayPal e clique no link Ajuda no canto superior direito de =
+qualquer p=E1gina de nosso site. Em caso de d=FAvidas, entre em contato =
+com o nosso SAC - Servi=E7o de Atendimento ao Consumidor: 0800-892-1555, =
+dispon=EDvel 24 horas por dia, sete dias por semana. Para deficientes =
+auditivos/fala, entre em contato conosco pelo telefone 0800-892-1571.
+
+Voc=EA pode receber e-mails de texto sem formata=E7=E3o, em vez de e-mails =
+HTML. Para alterar suas prefer=EAncias de notifica=E7=E3o, acesse a sua =
+conta, v=E1 para o seu Perfil e clique em Minhas configura=E7=F5es.
+
+
+
+----------------------------------------------------------------
+Copyright =A9 1999-2015 PayPal. Todos os direitos reservados.
+
+PPID PP120 - 7d789ca68f047=20
+
+----NextPart_048F8BC8A2197DE2036A
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset=windows-1252
+
+<html><head title=3D=22PayPal =22/><body><div class=3D=22ppmail=22><style =
+type=3D=22text/css=22>
+=09=09=09=09=09=09=09=09body, td =7Bfont-size: 12px;font-family: =
+arial,helvetica,sans-serif;=7D
+                               .itemtbl =7Bmargin-top:20px;=7D
+=09=09=09=09=09=09      .itemtbl tr td =7Bpadding: 10px;color: =23333;=7D
+=09=09=09=09    =09=09=09tr.itemheading td=7Bborder:1px solid =
+=23ccc;border-right:none;border-left:none;padding:5px 10px 5px 10px =
+=21important;color: =23333333 =21important;=7D
+=09=09=09=09=09=09=09=09.padtoptwty =7Bpadding-top:20px =21important;=7D
+=09=09=09=09=09=09=09=09tr.last td =7Bborder-bottom:none;=7D
+=09=09=09=09=09=09=09=09tr.itemrepeat td =7Bborder-bottom:1px dashed =
+=23ccc;=7D
+=09=09=09=09=09=09=09=09 .itemtbl =7Bmargin-top:20px;=7D
+=09=09=09=09=09=09=09    .itemtbl tr td =7Bpadding: 10px;color: =
+=23333;=7D=09
+=09=09=09=09=09=09=09    .content =7Bmargin-top: 30px;color:=23333 =
+=21important; =7D
+=09=09=09=09=09=09=09=09.mainheading=7Bcolor:=23333333;font-weight:bold;=7D
+=09=09=09=09      =09=09=09.confirm =7Bcolor: =234c8f3a;=7D
+=09=09=09=09=09=09=09=09.greeting =7Bcolor:=23333333 =
+=21important;font-weight:bold;=7D
+=09=09=09=09=09=09=09=09.status =
+=7Bfont-size:14px;color:=23C88039;font-weight:bold;text-decoration:none;=7D=
+=09
+=09=09=09=09=09=09=09=09.strong =7Bfont-weight: bold;=7D
+=09=09=09=09=09=09=09=09.valign =7Bvertical-align: middle;=7D
+=09=09=09=09=09=09=09=09.purchasebox =7Bwidth: 598px;=7D
+=09=09=09=09=09=09=09=09.purchasetitle =7Bborder-bottom:1px solid =
+=23ccc;padding:5px 0 5px 10px;=7D
+=09=09=09=09=09=09=09=09.purchaseboxmul =7Bborder:1px solid =
+=23ccc;margin:10px 0 10px 0;padding-bottom:10px;=7D
+=09=09=09=09=09=09=09=09.purchasetotal =7Bborder-top: 1px solid =
+=23ccc;border-bottom: 1px solid =23ccc;=7D
+=09=09=09=09=09=09=09=09.purchasetotal =7Bmargin: 7px 0 20px 0;=7D
+=09=09=09=09=09=09=09=09.purchasetotal tr td=7Bpadding-bottom:20px;=7D
+=09=09=09=09=09=09=09=09.purchasetotalmul =7Bborder-top: 1px solid =
+=23ccc;width : 580px;=7D
+=09=09=09=09=09=09=09=09.purchasetotalmul img , .purchasetotal img =
+=7Bmargin-top: 20px;=7D
+=09=09=09=09=09=09=09=09.purchasedetails tr =
+td=7Bcolor:=23333;padding-top:15px;=7D
+=09=09=09=09=09=09=09=09.purchasedetailsmul tr =
+td=7Bcolor:=23333;padding:20px 0 0 10px;=7D
+=09=09=09=09=09=09=09    .headinfo =7Bcolor:=23333333;=7D
+=09=09=09=09=09=09=09     hr =7Bcolor: =23dedede =21important;height:1px;=7D
+=09=09=09=09=09=09=09     .totaltbl =7Bmargin-top: 20px; width: 100%;=7D
+=09=09=09=09=09=09=09     .totaltbl tr td =7Btext-align:right;color: =
+=23333;padding:0 5px 0 0;width: 90px;=7D
+=09=09=09=09=09=09=09    .totaltblmlt =7Bmargin: 10px 0 0 10px;=7D
+=09=09=09=09=09=09=09    .totaltblmlt tr td =7Btext-align:right;color: =
+=23333;width: 85px;=7D
+=09=09=09=09=09=09=09    .totaltblmlt tr td.subhd , .totaltbl tr td.subhd =
+=7Bwidth: 390px;padding-right: 10px;text-align:right;=7D
+=09=09=09=09=09=09=09     .clr =7Bclear:both;=7D
+=09=09=09=09=09=09=09     .airtbl =7Bmargin-top : 30px;width:320px;=7D
+=09=09=09=09=09=09=09    .emphasis =7Bcolor:=23333333 =
+=21important;font-weight:bold;=7D
+=09=09=09=09=09=09=09     .padleftten =7Bpadding-left: 10px;=7D
+=09=09=09=09=09=09=09     .option =7Bcolor: =23aaaaaa;=7D
+=09=09=09=09=09=09=09     .fmf =7Bcolor:red;=7D
+=09=09=09=09=09=09=09      .airtbl tr td=7Bpadding-right: 15px;color: =
+=23757575;padding-bottom: 5px;=7D
+=09=09=09=09=09=09=09      .tblfooter =7Bcolor: =
+=23757575;padding-left:10px;=7D
+=09=09=09=09=09=09=09      .help=7Bmargin-right: 5px;vertical-align: =
+middle;=7D
+=09=09=09=09=09=09=09      .footercontainer=7Bwidth:400px;=7D
+=09=09=09=09=09=09=09      .exchange=7Bwidth:100%;=7D
+=09=09=09=09=09=09=09     =20
+/*For 26568 spec */
+=2EheaderDetails =7Bcolor:=23000000 =21important;font-weight:bold;=7D
+=2Edescription =7Bcolor:=23333333;=7D
+=2EtopBorder=7Bborder-top:1px solid =23CCCCCC;=7D
+=2EbottomBorder=7Bborder-bottom:1px solid =23CCCCCC;=7D
+=2EbottomMargin=7Bmargin:7px 0 20px;=7D
+=2EredFmf=7Bcolor:=23ff0000;=7D
+=2EpadBottom =7Bpadding-bottom:20px =21important;=7D
+=2EcontentNew =7Bcolor:=23666666;=7D
+HR.dotted =7Bwidth: 100%; margin-top: 0px; margin-bottom: 0px; =
+border-left: =23fff; border-right: =23fff; border-top: =23fff; =
+border-bottom: 2px dotted =23ccc;=7D
+=2EuseNextBox =7B
+background:=23FFFFFF =
+url(http://www.paypal.com/en_US/i/scr/scr_table_bg_1x70.gif) repeat-x =
+scroll left bottom;
+border:1px solid =23CCCCCC;
+border-collapse:separate;
+padding:10px 10 20px 10px;
+width:530px;
+margin-left:20px;
+margin-top:20px;
+color:=23333333;
+font-family:arial,helvetica,sans-serif;
+font-size:11px;
+=7D
+=2EboxHead=7Bwidth:530px;padding-bottom:10px =
+=21important;border-bottom:1px solid =23CCCCCC;text-align:left;=7D
+=2EboxHeadingTxt=7Bfont-size:12px;font-weight:bold;=7D
+=2EpadBoxTop =7Bpadding-top:10px =21important;=7D
+=2ESignupLink=7Bcolor:=23084482 =21important;=7D
+=09=09=09=09=09=09=09     </style>
+
+<table align=3D=22center=22 border=3D=220=22 cellpadding=3D=220=22 =
+cellspacing=3D=220=22 width=3D=22100%=22><tr><td/></tr></table><table =
+align=3D=22center=22 border=3D=220=22 cellpadding=3D=220=22 =
+cellspacing=3D=220=22 width=3D=22600=22><tr valign=3D=22top=22><td =
+width=3D=22100%=22><table align=3D=22center=22 border=3D=220=22 =
+cellpadding=3D=220=22 cellspacing=3D=220=22 style=3D=22color:=23333333 =
+=21important;font-family: arial,helvetica,sans-serif;font-size:12px;=22 =
+width=3D=22600=22><tr valign=3D=22top=22><td><img =
+src=3D=22http://images.paypal.com/en_US/i/logo/paypal_logo.gif=22 =
+border=3D=220=22 alt=3D=22Logotipo do PayPal=22/></td><td =
+valign=3D=22middle=22 align=3D=22right=22>24 ABR 2015 17:01:08 BRT<br/>ID =
+da transa=E7=E3o: <a target=3D=22new=22 =
+href=3D=22https://www.paypal.com/br/cgi-bin/webscr?cmd=3D_view-a-trans&amp;=
+id=3D8GN9834709005452A=22>8GN9834709005452A</a></td></tr></table><div =
+style=3D=22margin-top: 30px;color:=23333 =21important;font-family: =
+arial,helvetica,sans-serif;font-size:12px;=22><span =
+style=3D=22color:=23333333 =21important;font-weight:bold;font-family: =
+arial,helvetica,sans-serif;=22>Ol=E1, Lucas Vieira de =
+Oliveira,</span><br/><br/><p =
+style=3D=22font-size:14px;color:=23C88039;font-weight:bold;text-decoration:=
+none;=22>Voc=EA enviou um pagamento no valor de R=249,90 para E-Marcas =
+Servi=E7os em Propriedade Intelectual SS Ltda<br/><span =
+style=3D=22font-size:14px;color:=23C88039;font-weight:bold;text-decoration:=
+none;=22> (info=40e-marcas.com.br) </span></p><table =
+cellpadding=3D=225=22><tr><td =
+valign=3D=22top=22/><td/></tr></table><br/>Pode levar alguns segundos para =
+que esta transa=E7=E3o apare=E7a na sua conta.<br/><div =
+style=3D=22margin-top:5px;clear:both=22><hr size=3D=221=22/></div>
+<=21--=5Bif gte mso 9=5D><style>table.CartTable td =7Bpadding:5px 10px 5px =
+10px =21important;=7D</style><=21=5Bendif=5D-->
+<table border=3D=220=22 cellpadding=3D=220=22 cellspacing=3D=220=22 =
+style=3D=22color:=23666666 =21important;font-family: =
+arial,helvetica,sans-serif;font-size:11px;margin-bottom:20px;clear:both;=22=
+ width=3D=2298%=22 align=3D=22left=22><tr><td =
+style=3D=22padding-top:15px;=22 valign=3D=22top=22 width=3D=2250%=22 =
+align=3D=22left=22><span =
+style=3D=22color:=23333333;font-weight:bold;=22>Vendedor</span><br/>E-Marca=
+s Servi=E7os em Propriedade Intelectual SS =
+Ltda<br/>info=40e-marcas.com.br<br/>+55 1135223020</td><td =
+style=3D=22padding-top:15px;=22 valign=3D=22top=22><span =
+style=3D=22color:=23333333;font-weight:bold;=22> Instru=E7=F5es para o =
+vendedor</span><br/>Voc=EA n=E3o inseriu nenhuma =
+instru=E7=E3o</td></tr><tr><td style=3D=22padding-top:15px;=22 =
+valign=3D=22top=22 width=3D=2240%=22 align=3D=22left=22><span =
+style=3D=22font-family: =
+arial,helvetica,sans-serif;font-size:12px;color:=23333333;font-weight:bold;=
+=22>Endere=E7o de entrega</span><br/>Lucas Vieira de Oliveira<br/>Rua =
+Jos=E9 Rafaeli  506  Apto 64 BL 4<br/>Socorro<br/>S=E3o Paulo=A0 - =
+SP<br/>04763-280<br/>Brasil<br/></td><td style=3D=22padding-top:15px;=22 =
+valign=3D=22top=22><span =
+style=3D=22color:=23333333;font-weight:bold;=22>Detalhes da =
+entrega</span><br/>O vendedor ainda n=E3o forneceu detalhes da =
+entrega.</td></tr></table><div style=3D=22margin:auto; clear:both;=22><div =
+class=3D=22MktMPI=22 id=3D=22mpi840016=22><a =
+href=3Dhttps://www.paypal.com/webapps/mch/cmd/?v=3D3.0&t=3D1429905731&fdata=
+=3DJA0MW3IEWlVPRltJGExVX1xhcVlwaF5kFSAtUmt-XFtbUXBofl0hMUlVYw5iWnxAPhIBAn4F=
+W1BKQlpWXRkEDlNtfVp1YFhkBjkgC2QYOlhfV2E7MFN1Bi00AX0cSA4rEC0kQCBWHVtIVggeSRE=
+ZV19helpzZVlwRnl5X2luCQgEA3pqawV4Y1ITJVQ4DHZeYldOEH4EQ1ZfHQYESgcIGwcxdA8hYV=
+skR38sXm0rWghZXiU8aFR.N00DYF40Wn1RYFdcQC5cGQELFQsZSUgIDl5gL1tzNF92FXkoW2AqD=
+lkLUCVhPAcuMEZRYgliXG0FMwgFDycKX1BBRl5DFENLHgknIA54Yl91QHlvDCovAw1QVHZhbQFu=
+NBcTPFxsWG0HMhAGEy4KXUANFxlNRQEZGktmCE93F0twMCglGz8pGARDCiI8MVM4OREfe1s-BW5=
+UFwUMQ3FxDg1cQitCGkJfX0NneFt8Y1pvRH1-WmxlXExeISwvfQEMMR0GMVkiBSoDIgEFBypbHw=
+MaFQQAWVBfXAMlOw9gYioqAj05HHx6X1osQnUefQAOIgMQe0gwETsHPUkKFCJEBApXEwIdAxcfT=
+1wTLQMkNQ8xGygsHHx6LAoMFCIxKlM&cks=3DMjU0NDVkN2Q2ODEzNTBkOTdhNDUzNThlZGY1ZD=
+Y1MDE&e=3D1.0><img =
+src=3D'https://www.paypalobjects.com/webstatic/MarketingOperations/LATAM/LA=
+TAM2015/BR/imgBR_201504_LATAM02856_MothersDay_530x80.jpg' border=3D'0' =
+alt=3D'Descubra o presente ideal para sua m=E3e. Pague com PayPal e ganhe =
+at=E9 30% de desconto.' dir=3D'ltr'/></a></div></div><table =
+align=3D=22center=22 border=3D=220=22 cellpadding=3D=220=22 =
+cellspacing=3D=220=22 class=3D=22CartTable=22 =
+style=3D=22clear:both;color:=23666666 =21important;font-family: =
+arial,helvetica,sans-serif;font-size:11px;=22 width=3D=22100%=22><tr><td =
+style=3D=22border:1px solid =
+=23ccc;border-right:none;border-left:none;padding:5px 10px 5px 10px =
+=21important;color: =23333333 =21important;=22 width=3D=22350=22 =
+align=3D=22left=22>Descri=E7=E3o</td><td style=3D=22border:1px solid =
+=23ccc;border-right:none;border-left:none;padding:5px 10px 5px 10px =
+=21important;color: =23333333 =21important;=22 width=3D=22100=22 =
+align=3D=22right=22>Pre=E7o unit=E1rio</td><td style=3D=22border:1px solid =
+=23ccc;border-right:none;border-left:none;padding:5px 10px 5px 10px =
+=21important;color: =23333333 =21important;=22 width=3D=2250=22 =
+align=3D=22right=22>Qtd</td><td style=3D=22border:1px solid =
+=23ccc;border-right:none;border-left:none;padding:5px 10px 5px 10px =
+=21important;color: =23333333 =21important;=22 width=3D=2280=22 =
+align=3D=22right=22>Valor</td></tr><tr><td style=3D=22padding: 10px;=22 =
+align=3D=22left=22><br/></td><td style=3D=22padding: 10px;=22 =
+align=3D=22right=22>R=249,90</td><td style=3D=22padding: 10px;=22 =
+align=3D=22right=22>1</td><td style=3D=22padding: 10px;=22 =
+align=3D=22right=22>R=249,90</td></tr></table><table align=3D=22left=22 =
+border=3D=220=22 cellpadding=3D=220=22 cellspacing=3D=220=22 =
+style=3D=22border-top: 1px solid =23ccc;border-bottom: 1px solid =
+=23ccc;clear:both;color:=23666666 =21important;font-family: =
+arial,helvetica,sans-serif;font-size:11px;=22 =
+width=3D=22595=22><tr><td><table border=3D=220=22 cellpadding=3D=220=22 =
+cellspacing=3D=220=22 style=3D=22color:=23666666 =21important;font-family: =
+arial,helvetica,sans-serif;font-size:11px;margin-top: 20px;clear:both; =
+width:100%=22 align=3D=22right=22><tr><td =
+style=3D=22width:390px;text-align:right; padding:0 10px 0 =
+0;=22><strong>Subtotal</strong></td><td =
+style=3D=22width:90px;text-align:right; padding:0 5px 0 =
+0;=22>R=249,90</td></tr><tr><td style=3D=22width:390px;text-align:right; =
+padding:0 10px 0 0;=22><span style=3D=22color:=23333333 =
+=21important;font-weight:bold;=22>Total</span></td><td =
+style=3D=22width:90px;text-align:right; padding:0 5px 0 =
+0;=22>R=249,90</td></tr><tr><td style=3D=22width:390px;text-align:right; =
+padding: 20px 10px 0 0;=22><span style=3D=22color:=23333333 =
+=21important;font-weight:bold;=22>Pagamento</span></td><td =
+style=3D=22width:90px;text-align:right; padding:20px 5px 0 =
+0;=22>R=249,90</td></tr><tr><td style=3D=22width:390px;text-align:right; =
+padding:10px 10px 10px 0;=22>Esta cobran=E7a aparecer=E1 no extrato do seu =
+cart=E3o como =22PAYPAL *E-MARCAS=22<br/>Pagamento enviado a =
+info=40e-marcas.com.br</td><td style=3D=22width:90px;text-align:right; =
+padding:20px 5px 0 =
+0;=22/></tr><tr><td/></tr></table></td></tr></table><br/><br/><br/><span =
+style=3D=22clear:left;font-weight:bold;color:=23333333;=22>Problemas com =
+esta transa=E7=E3o?</span><br/>Voc=EA tem 45 dias a contar da data da =
+transa=E7=E3o para abrir uma disputa na Central de =
+solu=E7=F5es.<br/><br/><img =
+src=3D=22http://images.paypal.com/en_US/i/icon/icon_help_16x16.gif=22 =
+border=3D=220=22 style=3D=22margin-right: 5px;vertical-align: middle;=22 =
+alt=3D=22=22/>D=FAvidas? Visite a Central de ajuda em: =
+www.paypal.com/br/help.<br/><br/><br/><br/><span =
+style=3D=22font-size:11px;color:=23333;=22>N=E3o responda a esta mensagem. =
+Este e-mail foi enviado por um sistema automatizado que n=E3o processa =
+respostas. Para obter ajuda, acesse sua conta do PayPal e clique no link =
+Ajuda no canto superior direito de qualquer p=E1gina de nosso site. Em =
+caso de d=FAvidas, entre em contato com o nosso SAC - Servi=E7o de =
+Atendimento ao Consumidor: 0800-892-1555, dispon=EDvel 24 horas por dia, =
+sete dias por semana. Para deficientes auditivos/fala, entre em contato =
+conosco pelo telefone 0800-892-1571.</span><br/><br/><span =
+style=3D=22font-size:11px;color:=23333;=22>Voc=EA pode receber e-mails de =
+texto sem formata=E7=E3o, em vez de e-mails HTML. Para alterar suas =
+prefer=EAncias de notifica=E7=E3o, acesse a sua conta, v=E1 para o seu =
+Perfil e clique em <strong>Minhas =
+configura=E7=F5es</strong>.<br/><br/></span></div><br/><hr =
+width=3D=22400=22/><span class=3D=22xptFooter=22>Copyright =A9 1999-2015 =
+PayPal. Todos os direitos reservados.<br/></span><br/><span =
+style=3D=22color: =23333333;font-family: =
+arial,helvetica,sans-serif;font-size:11px;=22><span class=3D=22xptFooter =
+ppid=22>ID de e-mail do PayPal PP120 - 7d789ca68f047</span></span><img =
+height=3D=221=22 width=3D=221=22 =
+src=3D=22https://paypal.112.2o7.net/b/ss/paypalglobal/1/H.22--NS/1972409621=
+?c6=3D5H372976GK244364J&amp;v0=3DPP120_1_266327&amp;pe=3Dlnk_o&amp;pev1=3De=
+mail&amp;pev2=3DD=3Dv0&amp;events=3DscOpen=22 border=3D=220=22 =
+alt=3D=22=22/></td></tr></table></div></body></html>=
+
+----NextPart_048F8BC8A2197DE2036A--
+
